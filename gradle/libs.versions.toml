@@ -1,0 +1,62 @@
+[versions]
+# Gradle Plugin
+agp = "8.8.0"
+
+# Android SDK
+compileSdk = "34"
+targetSdk = "34"
+minSdk = "21"
+buildTools = "34.0.0"
+
+# Java
+javaVersion = "17"
+
+# AndroidX
+appcompat = "1.6.1"
+material = "1.11.0"
+annotation = "1.7.1"
+
+# Commons
+commons-io = "2.15.1"
+commons-codec = "1.16.0"
+commons-lang3 = "3.14.0"
+
+# JSON & Gson
+json = "20080701"
+gson = "2.10.1"
+
+# CLI Tools
+jcommander = "1.82"
+shadow = "8.1.1"
+
+# Testing
+junit = "4.13.2"
+
+[libraries]
+# Android Gradle Plugin
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+
+# AndroidX
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-material = { module = "com.google.android.material:material", version.ref = "material" }
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
+
+# Commons
+commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
+commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
+
+# JSON & Gson
+json = { module = "org.json:json", version.ref = "json" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+
+# CLI Tools
+jcommander = { module = "com.beust:jcommander", version.ref = "jcommander" }
+
+# Testing
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

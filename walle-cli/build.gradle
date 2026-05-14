@@ -1,16 +1,8 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath 'com.github.johnrengelman:shadow:8.1.1'
-    }
+plugins {
+    id 'java-library'
+    alias(libs.plugins.shadow)
 }
 
-apply plugin: 'java-library'
-apply plugin: 'com.github.johnrengelman.shadow'
 // apply from: rootProject.file('quality.gradle')
 
 jar {
@@ -22,11 +14,11 @@ jar {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "com.beust:jcommander:1.82"
-    implementation 'commons-io:commons-io:2.15.1'
+    implementation libs.jcommander
+    implementation libs.commons.io
     implementation project(':payload_writer')
-    implementation 'org.json:json:20080701' //与gradle plugin使用同一版本
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation libs.json
+    implementation libs.gson
 }
 
 sourceCompatibility = javaVersion

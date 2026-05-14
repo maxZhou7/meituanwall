@@ -1,1 +1,24 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    // This section is for declaring plugins that can be used in the build
+    // but not applying them. We use version catalog for versions.
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+    }
+}
+
 include ':plugin', ':library', ':payload_reader', ':payload_writer', ':walle-cli', ':app'
