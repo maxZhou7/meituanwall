@@ -6,7 +6,8 @@ apply from: rootProject.file('quality.gradle')
 
 android {
     namespace 'com.meituan.android.walle'
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdkVersion
+
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -31,7 +32,7 @@ android {
     }
 }
 
-configurations.all {
+configurations.configureEach {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 

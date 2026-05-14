@@ -4,6 +4,7 @@ agp = "8.8.0"
 
 # Android SDK
 compileSdk = "34"
+jsonVersion = "20251224"
 targetSdk = "34"
 minSdk = "21"
 buildTools = "34.0.0"
@@ -22,7 +23,6 @@ commons-codec = "1.16.0"
 commons-lang3 = "3.14.0"
 
 # JSON & Gson
-json = "20080701"
 gson = "2.10.1"
 
 # CLI Tools
@@ -47,13 +47,13 @@ commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons
 commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
 
 # JSON & Gson
-json = { module = "org.json:json", version.ref = "json" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
 # CLI Tools
 jcommander = { module = "com.beust:jcommander", version.ref = "jcommander" }
 
 # Testing
+json-v20251224 = { module = "org.json:json", version.ref = "jsonVersion" }
 junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]

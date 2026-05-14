@@ -17,7 +17,7 @@ dependencies {
     implementation libs.jcommander
     implementation libs.commons.io
     implementation project(':payload_writer')
-    implementation libs.json
+    implementation libs.json.v20251224
     implementation libs.gson
 }
 

@@ -6,7 +6,7 @@ checkstyle {
     toolVersion = "10.12.4"
 }
 
-task checkstyle(type: Checkstyle) {
+tasks.register('checkstyle', Checkstyle) {
     configFile rootProject.file("config/style/checkstyle.xml")
     source 'src'
     include '**/*.java'
