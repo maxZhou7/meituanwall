@@ -22,22 +22,12 @@ class GradlePlugin implements org.gradle.api.Plugin<Project> {
 
         String version = null
         try {
-            def clazz = Class.forName("com.android.builder.Version")
+            def clazz = Class.forName("com.android.builder.model.Version")
             def field = clazz.getDeclaredField("ANDROID_GRADLE_PLUGIN_VERSION")
             field.setAccessible(true)
             version = field.get(null)
         } catch (ClassNotFoundException ignore) {
         } catch (NoSuchFieldException ignore) {
-        }
-        if (version == null) {
-            try {
-                def clazz = Class.forName("com.android.builder.model.Version")
-                def field = clazz.getDeclaredField("ANDROID_GRADLE_PLUGIN_VERSION")
-                field.setAccessible(true)
-                version = field.get(null)
-            } catch (ClassNotFoundException ignore) {
-            } catch (NoSuchFieldException ignore) {
-            }
         }
 
         if (version != null && versionCompare(version, "2.2.0") < 0) {

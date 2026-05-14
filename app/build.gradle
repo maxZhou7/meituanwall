@@ -1,24 +1,10 @@
-import com.android.build.gradle.api.BaseVariant
-
 apply plugin: 'com.android.application'
-apply plugin: 'walle'
+// apply plugin: 'walle' - Temporarily disabled, use CLI tool instead
 apply from: rootProject.file('quality.gradle')
 
-buildscript {
-    repositories {
-        mavenLocal()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
-        classpath "com.meituan.android.walle:plugin:latest.integration"
-    }
-}
-
 android {
-
+    namespace 'com.meituan.android.walle.sample'
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -33,7 +19,7 @@ android {
         abi {
             enable true
             reset()
-            include 'armeabi', 'x86'
+            include 'armeabi-v7a', 'x86'
             universalApk false
         }
     }
@@ -42,7 +28,7 @@ android {
         sign {
             storeFile file("keystore/sign-debug.keystore")
             storePassword "1234567"
-            keyAlias "debug"
+            keyAlias "meituan"
             keyPassword "12345678"
         }
     }
@@ -66,8 +52,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
 //    productFlavors {
@@ -83,29 +69,31 @@ configurations.all {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-v4:24.1.1'
-    compile 'com.android.support:appcompat-v7:24.1.1'
-    compile project(':library')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation project(':library')
 }
 
-walle {
-    apkOutputFolder = new File("${project.buildDir}/outputs/channels")
-    apkFileNameFormat = '${appName}-${packageName}-${channel}-${buildType}-v${versionName}-${versionCode}-${buildTime}-${flavorName}.apk'
-    //configFile与channelFile两者必须存在一个，否则无法生成渠道包。两者都存在时优先执行configFile
-    channelFile = new File("${project.getProjectDir()}/channel")
-    //configFile = new File("${project.getProjectDir()}/config.json")
-}
+// Walle plugin configuration - Temporarily disabled
+// Use walle CLI tool instead for channel package generation
+// walle {
+//     apkOutputFolder = new File("${project.buildDir}/outputs/channels")
+//     apkFileNameFormat = '${appName}-${packageName}-${channel}-${buildType}-v${versionName}-${versionCode}-${buildTime}-${flavorName}.apk'
+//     //configFile与channelFile两者必须存在一个，否则无法生成渠道包。两者都存在时优先执行configFile
+//     channelFile = new File("${project.getProjectDir()}/channel")
+//     //configFile = new File("${project.getProjectDir()}/config.json")
+// }
 
 
 // 根据不同的applicationId来配置不同的channelFile／configFile
-afterEvaluate {
-    project.android.applicationVariants.all { BaseVariant variant ->
-        variant.assemble.doFirst {
-            if (variant.applicationId.endsWith(".debug")) {
-
-                project.walle.channelFile = new File("${project.getProjectDir()}/channel_debug")
-            }
-        }
-    }
-}
+// Temporarily disabled for Gradle 8.x compatibility
+// afterEvaluate {
+//     project.android.applicationVariants.all { BaseVariant variant ->
+//         variant.assemble.doFirst {
+//             if (variant.applicationId.endsWith(".debug")) {
+//                 project.walle.channelFile = new File("${project.getProjectDir()}/channel_debug")
+//             }
+//         }
+//     }
+// }

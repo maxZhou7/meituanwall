@@ -1,1 +1,1 @@
-include ':plugin', ':library', ':payload_reader', ':payload_writer', ':app', ':walle-cli'
+include ':plugin', ':library', ':payload_reader', ':payload_writer', ':walle-cli', ':app'

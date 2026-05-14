@@ -2,27 +2,19 @@
 buildscript {
     repositories {
         mavenLocal()
-        jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+        google()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+        classpath 'com.android.tools.build:gradle:8.1.4'
     }
 }
 
 allprojects {
     repositories {
         mavenLocal()
-        jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+        google()
+        mavenCentral()
     }
 
     tasks.withType(Javadoc).all {
@@ -36,11 +28,11 @@ allprojects {
 }
 
 ext {
-    minSdkVersion = 9
-    compileSdkVersion = 24
-    targetSdkVersion = compileSdkVersion
-    buildToolsVersion = '24.0.1'
-    javaVersion = JavaVersion.VERSION_1_7
+    minSdkVersion = 21
+    compileSdkVersion = 34
+    targetSdkVersion = 34
+    buildToolsVersion = '34.0.0'
+    javaVersion = JavaVersion.VERSION_17
 }
 
 task clean(type: Delete) {
