@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.4'
+        classpath 'com.android.tools.build:gradle:8.7.2'
     }
 }
 
@@ -17,13 +17,15 @@ allprojects {
         mavenCentral()
     }
 
-    tasks.withType(Javadoc).all {
+    tasks.withType(Javadoc).configureEach {
         enabled = false
         options.encoding = 'UTF-8'
     }
-    
-    tasks.withType(JavaCompile) {
-        options.encoding = "UTF-8"
+
+    tasks.withType(JavaCompile).tap {
+        configureEach {
+            options.encoding = "UTF-8"
+        }
     }
 }
 
@@ -35,6 +37,6 @@ ext {
     javaVersion = JavaVersion.VERSION_17
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }

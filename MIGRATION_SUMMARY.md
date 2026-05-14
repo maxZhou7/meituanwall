@@ -7,8 +7,8 @@
 
 ### 1. Gradle 升级
 - **原版本**: Gradle 2.14.1 (2016年)
-- **新版本**: Gradle 8.7-bin
-- **下载地址**: 使用阿里云镜像加速
+- **新版本**: Gradle 8.13
+- **下载地址**: 使用官方镜像
 
 ### 2. Android Gradle Plugin (AGP) 升级
 - **原版本**: AGP 2.2.0
@@ -148,7 +148,7 @@ java -jar walle-cli/build/libs/walle-cli-all.jar put -c channel_name app.apk
 - **Android SDK**: 
   - Platform: Android 34
   - Build Tools: 34.0.0
-- **Gradle**: 8.7
+- **Gradle**: 8.13
 - **Android Gradle Plugin**: 8.1.4
 
 ## 测试状态
