@@ -1,195 +1,274 @@
-# Walle
-[![Release Version](https://api.bintray.com/packages/meituan/maven/com.meituan.android.walle:library/images/download.svg)](https://github.com/Meituan-Dianping/walle/releases)
-[![Build Status](https://api.travis-ci.org/Meituan-Dianping/walle.svg?branch=master)](https://travis-ci.org/Meituan-Dianping/walle)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/walle/pulls)
+# Walle (瓦力) - Android 渠道包打包工具
+
+> **项目来源**: 本项目 fork 自 [美团点评 Walle](https://github.com/Meituan-Dianping/walle)，在此基础上进行了现代化升级和维护。
+> 
+> **原始项目**: https://github.com/Meituan-Dianping/walle  
+> **技术文章**: [美团Android新一代渠道包生成工具](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)
+
+[![Release Version](https://img.shields.io/badge/release-2.0.2-blue.svg)](https://gitee.com/maxchou/walle/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
 
-Walle（瓦力）：Android Signature V2 Scheme签名下的新一代渠道包打包神器
+## 📖 项目简介
 
-瓦力通过在Apk中的`APK Signature Block`区块添加自定义的渠道信息来生成渠道包，从而提高了渠道包生成效率，可以作为单机工具来使用，也可以部署在HTTP服务器上来实时处理渠道包Apk的升级网络请求。
+Walle（瓦力）是 Android Signature V2 Scheme 签名下的新一代渠道包打包神器。
 
-## Quick Start
-为了方便大家的使用，我们提供了2种使用方式：
+瓦力通过在 Apk 中的 `APK Signature Block` 区块添加自定义的渠道信息来生成渠道包，从而提高了渠道包生成效率，可以作为单机工具来使用，也可以部署在HTTP服务器上来实时处理渠道包 Apk 的升级网络请求。
 
-* Gradle插件方式，方便快速集成
-* 命令行方式，最大化满足各种自定义需求
+## 🚀 快速开始
 
-### Gradle插件使用方式
-#### 配置build.gradle
+我们提供了多种使用方式：
 
-在位于项目的根目录 `build.gradle` 文件中添加Walle Gradle插件的依赖， 如下：
+* **Library 依赖方式** - 推荐，简单易用
+* **命令行工具方式** - 灵活，支持自定义需求
+* ~~Gradle 插件方式~~ - 暂时禁用（待适配 AGP 8.x）
 
-```groovy
-buildscript {
-    dependencies {
-        classpath 'com.meituan.android.walle:plugin:1.1.7'
+### 方式一：Library 依赖（推荐）
+
+#### 1. 添加 JitPack 仓库
+
+在项目根目录的 `settings.gradle` 或 `build.gradle` 中添加：
+
+```gradle
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 }
 ```
 
-并在当前App的 `build.gradle` 文件中apply这个插件，并添加上用于读取渠道号的AAR
+#### 2. 添加依赖
 
-```groovy
-apply plugin: 'walle'
+在 App 模块的 `build.gradle` 中添加：
 
+```gradle
 dependencies {
-    compile 'com.meituan.android.walle:library:1.1.7'
+    implementation 'com.gitee.maxchou:walle:2.0.2'
 }
 ```
 
-#### 配置插件
-
-```groovy
-walle {
-    // 指定渠道包的输出路径
-    apkOutputFolder = new File("${project.buildDir}/outputs/channels");
-    // 定制渠道包的APK的文件名称
-    apkFileNameFormat = '${appName}-${packageName}-${channel}-${buildType}-v${versionName}-${versionCode}-${buildTime}.apk';
-    // 渠道配置文件
-    channelFile = new File("${project.getProjectDir()}/channel")
-}
-```
-
-配置项具体解释：
-
-* apkOutputFolder：指定渠道包的输出路径， 默认值为`new File("${project.buildDir}/outputs/apk")`
-* apkFileNameFormat：定制渠道包的APK的文件名称, 默认值为`'${appName}-${buildType}-${channel}.apk'`  
-	可使用以下变量:
-                  
-	```
-	    projectName - 项目名字
-	    appName - App模块名字
-	    packageName - applicationId (App包名packageName)
-	    buildType - buildType (release/debug等)
-	    channel - channel名称 (对应渠道打包中的渠道名字)
-	    versionName - versionName (显示用的版本号)
-	    versionCode - versionCode (内部版本号)
-	    buildTime - buildTime (编译构建日期时间)
-	    fileSHA1 - fileSHA1 (最终APK文件的SHA1哈希值)
-	    flavorName - 编译构建 productFlavors 名
-	```  
-* channelFile：包含渠道配置信息的文件路径。 具体内容格式详见：[渠道配置文件示例](app/channel)，支持使用#号添加注释。
-
-#### 如何获取渠道信息
-
-在需要渠道等信息时可以通过下面代码进行获取
+#### 3. 获取渠道信息
 
 ```java
-String channel = WalleChannelReader.getChannel(this.getApplicationContext());
-```
+import com.meituan.android.walle.WalleChannelReader;
 
-#### 如何生成渠道包
+// 获取渠道名称
+String channel = WalleChannelReader.getChannel(context);
 
-生成渠道包的方式是和`assemble${variantName}Channels`指令结合，渠道包的生成目录默认存放在 `build/outputs/apk/`，也可以通过`walle`闭包中的`apkOutputFolder`参数来指定输出目录
-
-用法示例：
-
-* 生成渠道包 `./gradlew clean assembleReleaseChannels`
-* 支持 productFlavors `./gradlew clean assembleMeituanReleaseChannels`
-
-#### 更多用法
-
-##### 插入额外信息
-
-`channelFile`只支持渠道写入，如果想插入除渠道以外的其他信息，请在walle配置中使用`configFile`
-
-```
-walle {
-    // 渠道&额外信息配置文件，与channelFile互斥
-	configFile = new File("${project.getProjectDir()}/config.json")
-}
-```
-
-`configFile`是包含渠道信息和额外信息的配置文件路径。  
-配置文件采用json格式，支持为每个channel单独配置额外的写入信息。具体内容格式详见：[渠道&额外信息配置文件示例](app/config.json) 。
-
-注意：
-
-- 此配置项与`channelFile`功能互斥，开发者在使用时选择其一即可，两者都存在时`configFile`优先执行。
-- extraInfo 不要出现以`channel`为key的情况
-
-而对应的渠道信息获取方式如下：
-
-```java
-ChannelInfo channelInfo= WalleChannelReader.getChannelInfo(this.getApplicationContext());
+// 获取完整渠道信息
+ChannelInfo channelInfo = WalleChannelReader.getChannelInfo(context);
 if (channelInfo != null) {
-   String channel = channelInfo.getChannel();
-   Map<String, String> extraInfo = channelInfo.getExtraInfo();
+    String channel = channelInfo.getChannel();
+    Map<String, String> extraInfo = channelInfo.getExtraInfo();
 }
-// 或者也可以直接根据key获取
-String value = WalleChannelReader.get(context, "buildtime");
+
+// 根据 key 获取额外信息
+String buildTime = WalleChannelReader.get(context, "buildtime");
 ```
 
-##### 临时生成某渠道包
+### 方式二：命令行工具
 
-我们推荐使用channelFile/configFile配置来生成渠道包，但有时也可能有临时生成渠道包需求，这时可以使用：
+详细的 CLI 使用说明请参考：[Walle CLI 使用说明](walle-cli/README.md)
 
-- 生成单个渠道包: `./gradlew clean assembleReleaseChannels -PchannelList=meituan`
-- 生成多个渠道包: `./gradlew clean assembleReleaseChannels -PchannelList=meituan,dianping`
-- 生成渠道包&写入额外信息:  
+#### 基本用法
 
-  `./gradlew clean assembleReleaseChannels -PchannelList=meituan -PextraInfo=buildtime:20161212,hash:xxxxxxx`  
-  
-  注意: 这里的extraInfo以`key:value`形式提供，多个以`,`分隔。
-- 使用临时channelFile生成渠道包: `./gradlew clean assembleReleaseChannels -PchannelFile=/Users/xx/Documents/channel`
-- 使用临时configFile生成渠道包: `./gradlew clean assembleReleaseChannels -PconfigFile=/Users/xx/Documents/config.json`
+```bash
+# 查看 APK 渠道信息
+java -jar walle-cli-all.jar show app-release.apk
 
-使用上述-P参数后，本次打包channelFile/configFile配置将会失效，其他配置仍然有效。
-`-PchannelList`,`-PchannelFile`, `-PconfigFile`三者不可同时使用。
+# 写入渠道信息
+java -jar walle-cli-all.jar put -c meituan app-release.apk app-release-meituan.apk
 
-### 命令行工具使用方式
+# 批量写入渠道
+java -jar walle-cli-all.jar batch -f channel.txt app-release.apk output/
+```
 
-可以使用命令行工具来支持各类自定义的需求，具体使用方式详见：[Walle CLI 使用说明](walle-cli/README.md)
+## 📦 生成渠道包
 
-### 其他使用方式
+### 使用 CLI 工具批量生成
 
-为了更好的满足大家的各类自定义需求，我们把对`APK Signing Block`区块进行读写操作的模块进行了封装。
+1. **准备渠道配置文件** (`channel.txt`)
+```
+meituan
+dianping
+xiaomi
+huawei
+```
 
-读写模块的使用说明详见：
+2. **执行批量命令**
+```bash
+java -jar walle-cli-all.jar batch -f channel.txt app-release.apk channels/
+```
 
-* [APK Signing Block读取模块: payload_reader](payload_reader/README.md)
-* [APK Signing Block写入模块: payload_writer](payload_writer/README.md)
+3. **验证渠道信息**
+```bash
+java -jar walle-cli-all.jar show channels/app-release-meituan.apk
+```
 
-## Q&A
-- [360加固失效](https://github.com/Meituan-Dianping/walle/wiki/360%E5%8A%A0%E5%9B%BA%E5%A4%B1%E6%95%88%EF%BC%9F)？
+## 🔧 高级用法
 
-## 原理介绍
+### 插入额外信息
 
-对该工具的原理感兴趣的同学，可以移步[美团Android新一代渠道包生成工具](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)进行了解。
+除了渠道信息，还可以插入其他自定义信息：
 
-## 注意事项
+```bash
+java -jar walle-cli-all.jar put \
+  -c meituan \
+  -e buildtime:20260101,hash:abc123 \
+  app-release.apk \
+  app-release-meituan.apk
+```
 
-* 使用apksigner重新对Apk签名会导致渠道信息丢失，需要再次写入渠道信息
-* 1.1.3版本起，walle支持对含有comment的apk进行渠道写入, 详见[issue 52](https://github.com/Meituan-Dianping/walle/issues/52)
+### 读取额外信息
 
-## 技术支持
+```java
+// 获取所有额外信息
+Map<String, String> extraInfo = WalleChannelReader.getExtraInfo(context);
 
-* Read The Fucking Source Code
-* 通过提交issue来寻求帮助
-* 联系我们寻求帮助
+// 获取指定的额外信息
+String buildTime = WalleChannelReader.get(context, "buildtime");
+```
 
-## 贡献代码
-* 欢迎提交issue
-* 欢迎提交PR
+## 📚 模块说明
 
-## 参考
-* [APK Signature Scheme v2](https://source.android.com/security/apksigning/v2.html)
-* [Zip Format](https://en.wikipedia.org/wiki/Zip_(file_format))
-* [Android Source Code: ApkSigner](https://android.googlesource.com/platform/build/+/8740e9d)
-* [Android Source Code: apksig](https://android.googlesource.com/platform/tools/apksig/)
+本项目包含以下模块：
 
-## License
+| 模块 | 说明 |
+|------|------|
+| **library** | Android Library，提供渠道信息读取功能 |
+| **payload_reader** | APK Signing Block 读取模块 |
+| **payload_writer** | APK Signing Block 写入模块 |
+| **walle-cli** | 命令行工具 |
+| ~~plugin~~ | Gradle 插件（暂时禁用） |
+| app | 示例应用 |
 
-    Copyright 2017 Meituan-Dianping
+各模块的详细文档：
+- [Payload Reader 使用说明](payload_reader/README.md)
+- [Payload Writer 使用说明](payload_writer/README.md)
+- [Walle CLI 使用说明](walle-cli/README.md)
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+## ❓ 常见问题
 
-       http://www.apache.org/licenses/LICENSE-2.0
+### 1. 为什么选择 Walle？
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+- **速度快**: 基于 APK Signature V2 Scheme，无需重新签名和压缩
+- **兼容性好**: 支持 Android 7.0+ 的 V2 签名方案
+- **灵活性高**: 支持渠道信息和自定义额外信息
+
+### 2. 使用 apksigner 重新签名会怎样？
+
+使用 apksigner 重新对 Apk 签名会导致渠道信息丢失，需要再次写入渠道信息。
+
+### 3. 与 360 加固的兼容性？
+
+请参考：[360加固失效问题](https://github.com/Meituan-Dianping/walle/wiki/360%E5%8A%A0%E5%9B%BA%E5%A4%B1%E6%95%88%EF%BC%9F)
+
+### 4. Gradle 插件什么时候支持？
+
+由于 AGP 8.x 的 API 发生重大变化，Gradle 插件需要大量重构才能适配。目前推荐使用 CLI 工具或 Library 依赖方式。
+
+## 🛠️ 构建项目
+
+如果你想自己构建项目：
+
+```bash
+# 克隆项目
+git clone https://gitee.com/maxchou/walle.git
+cd walle
+
+# 清理并构建
+./gradlew clean build
+
+# 构建 CLI 工具
+./gradlew :walle-cli:shadowJar
+
+# 发布到本地 Maven
+./gradlew :payload_reader:publishToMavenLocal :library:publishToMavenLocal
+```
+## ⚡ 升级说明
+
+### 本次升级内容
+
+本项目在美团原版 Walle 的基础上进行了全面的现代化升级：
+
+#### 1. **构建工具升级**
+- ✅ Gradle 升级到 **8.13**
+- ✅ Android Gradle Plugin (AGP) 升级到 **8.8.0**
+- ✅ Java 版本升级到 **Java 17**
+- ✅ Compile SDK 升级到 **34**
+
+#### 2. **依赖管理现代化**
+- ✅ 采用 **Version Catalog** (libs.versions.toml) 统一管理依赖版本
+- ✅ 使用现代化的 **Plugin Management** 配置
+- ✅ 使用 **Plugins DSL** 替代传统的 buildscript 方式
+
+#### 3. **代码规范优化**
+- ✅ 替换已废弃的 API（如 `buildDir` → `layout.buildDirectory`）
+- ✅ 修复 `applicationIdSuffix` 配置问题
+- ✅ 使用 `proguard-android-optimize.txt` 替代 `proguard-android.txt`
+- ✅ 更新所有第三方依赖到最新版本
+
+#### 4. **发布支持**
+- ✅ 支持通过 **JitPack** 发布和分发
+- ✅ 配置完整的 Maven Publish 支持
+- ✅ 提供 sources jar 和 javadoc jar
+
+#### 5. **模块优化**
+- ✅ 为 `payload_reader` 模块添加 Maven 发布支持
+- ✅ 修复多模块依赖问题
+- ✅ 优化 `jitpack.yml` 构建配置
+
+### 兼容性说明
+
+- **最低支持**: Android 5.0 (API 21)
+- **目标版本**: Android 14 (API 34)
+- **Java 版本**: Java 17
+- **Gradle 版本**: 8.13+
+- **AGP 版本**: 8.8.0+
+
+> ⚠️ **注意**: 由于 AGP 8.x 的 API 变化，Gradle 插件功能暂时禁用，推荐使用 CLI 工具或 Library 依赖方式使用。
+
+
+## 🤝 贡献指南
+
+本项目欢迎任何形式的贡献：
+
+- 🐛 提交 Bug 报告
+- 💡 提出新功能建议
+- 📝 改进文档
+- 🔧 提交代码修复
+
+## 📄 License
+
+```
+Copyright 2017 Meituan-Dianping
+Copyright 2026 maxchou (forked version)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+
+## 🙏 致谢
+
+- **原始项目**: [美团点评 Walle](https://github.com/Meituan-Dianping/walle)
+- **技术支持**: [美团技术团队](http://tech.meituan.com/)
+- **参考文档**: 
+  - [APK Signature Scheme v2](https://source.android.com/security/apksigning/v2.html)
+  - [Zip Format](https://en.wikipedia.org/wiki/Zip_(file_format))
+
+---
+
+**当前维护者**: [@maxchou](https://gitee.com/maxchou)  
+**项目地址**: https://gitee.com/maxchou/walle  
+**原始项目**: https://github.com/Meituan-Dianping/walle
