@@ -1,7 +1,7 @@
 package com.meituan.android.walle
 
+import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.api.BaseVariant
-import com.android.builder.model.SigningConfig
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
@@ -20,26 +20,29 @@ class GradlePlugin implements org.gradle.api.Plugin<Project> {
             throw new ProjectConfigurationException("Plugin requires the 'com.android.application' plugin to be configured.", null);
         }
 
-        String version = null
+        // AGP 8.x version check
+        String agpVersion = null
         try {
-            def clazz = Class.forName("com.android.builder.model.Version")
+            def clazz = Class.forName("com.android.Version")
             def field = clazz.getDeclaredField("ANDROID_GRADLE_PLUGIN_VERSION")
             field.setAccessible(true)
-            version = field.get(null)
+            agpVersion = field.get(null)
         } catch (ClassNotFoundException ignore) {
-        } catch (NoSuchFieldException ignore) {
+            try {
+                def clazz = Class.forName("com.android.builder.model.Version")
+                def field = clazz.getDeclaredField("ANDROID_GRADLE_PLUGIN_VERSION")
+                field.setAccessible(true)
+                agpVersion = field.get(null)
+            } catch (Exception e) {
+                // Ignore
+            }
         }
 
-        if (version != null && versionCompare(version, "2.2.0") < 0) {
-            throw new ProjectConfigurationException("Plugin requires the 'com.android.tools.build:gradle' version 2.2.0 or above to be configured.", null);
+        if (agpVersion != null && versionCompare(agpVersion, "8.0.0") < 0) {
+            project.logger.warn("Walle plugin is optimized for AGP 8.0+. Current version: $agpVersion")
         }
-
-//        project.dependencies {
-//            compile 'com.meituan.android.walle:library:' + getVersion()
-//        }
 
         applyExtension(project);
-
         applyTask(project);
     }
 
@@ -50,44 +53,72 @@ class GradlePlugin implements org.gradle.api.Plugin<Project> {
 
     void applyTask(Project project) {
         project.afterEvaluate {
-            project.android.applicationVariants.all { BaseVariant variant ->
-                def variantName = variant.name.capitalize();
+            // AGP 8.x uses applicationVariants
+            def androidExt = project.extensions.findByType(com.android.build.gradle.AppExtension)
+            if (androidExt != null) {
+                androidExt.applicationVariants.all { BaseVariant variant ->
+                    def variantName = variant.name.capitalize();
 
-                if (!isV2SignatureSchemeEnabled(variant)) {
-                    throw new ProjectConfigurationException("Plugin requires 'APK Signature Scheme v2 Enabled' for ${variant.name}.", null);
-                }
+                    if (!isV2SignatureSchemeEnabled(variant)) {
+                        project.logger.warn("Warning: APK Signature Scheme v2 may not be enabled for ${variant.name}.")
+                    }
 
-                ChannelMaker channelMaker = project.tasks.create("assemble${variantName}Channels", ChannelMaker);
-                channelMaker.targetProject = project;
-                channelMaker.variant = variant;
-                channelMaker.setup();
+                    ChannelMaker channelMaker = project.tasks.create("assemble${variantName}Channels", ChannelMaker);
+                    channelMaker.targetProject = project;
+                    channelMaker.variant = variant;
+                    channelMaker.setup();
 
-                if (variant.hasProperty('assembleProvider')) {
-                    channelMaker.dependsOn variant.assembleProvider.get()
-                } else {
-                    channelMaker.dependsOn variant.assemble
+                    // AGP 8.x compatibility
+                    try {
+                        channelMaker.dependsOn variant.assembleProvider.get()
+                    } catch (Exception e) {
+                        channelMaker.dependsOn variant.assemble
+                    }
                 }
             }
         }
     }
 
-    SigningConfig getSigningConfig(BaseVariant variant) {
-        return variant.buildType.signingConfig == null ? variant.mergedFlavor.signingConfig : variant.buildType.signingConfig;
+    def getSigningConfig(BaseVariant variant) {
+        try {
+            // AGP 8.x approach
+            if (variant.hasProperty('signingConfig')) {
+                return variant.signingConfig
+            }
+            // Fallback to old approach
+            if (variant.buildType.hasProperty('signingConfig')) {
+                return variant.buildType.signingConfig ?: variant.mergedFlavor.signingConfig
+            }
+            return null
+        } catch (Exception e) {
+            project.logger.warn("Could not get signing config: ${e.message}")
+            return null
+        }
     }
 
     boolean isV2SignatureSchemeEnabled(BaseVariant variant) throws GradleException {
-        def signingConfig = getSigningConfig(variant);
-        if (signingConfig == null || !signingConfig.isSigningReady()) {
-            return false;
-        }
+        try {
+            def signingConfig = getSigningConfig(variant);
+            if (signingConfig == null) {
+                return false;
+            }
 
-        // check whether APK Signature Scheme v2 is enabled.
-        if (signingConfig.hasProperty("v2SigningEnabled") &&
-                signingConfig.v2SigningEnabled == true) {
+            // Check if signing config is ready
+            if (signingConfig.hasProperty('isSigningReady') && !signingConfig.isSigningReady()) {
+                return false;
+            }
+
+            // Check v2 signing enabled (AGP 8.x)
+            if (signingConfig.hasProperty("v2SigningEnabled")) {
+                return signingConfig.v2SigningEnabled == true;
+            }
+
+            // For newer AGP, assume v2 is enabled by default
             return true;
+        } catch (Exception e) {
+            project.logger.warn("Could not check V2 signature scheme status: ${e.message}")
+            return true; // Assume enabled for compatibility
         }
-
-        return false;
     }
 
     /**

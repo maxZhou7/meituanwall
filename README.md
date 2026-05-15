@@ -20,8 +20,8 @@ Walle（瓦力）是 Android Signature V2 Scheme 签名下的新一代渠道包�
 我们提供了多种使用方式：
 
 * **Library 依赖方式** - 推荐，简单易用
+* **Gradle 插件方式** - 集成方便，自动化打包
 * **命令行工具方式** - 灵活，支持自定义需求
-* ~~Gradle 插件方式~~ - 暂时禁用（待适配 AGP 8.x）
 
 ### 方式一：Library 依赖（推荐）
 
@@ -68,7 +68,132 @@ if (channelInfo != null) {
 String buildTime = WalleChannelReader.get(context, "buildtime");
 ```
 
-### 方式二：命令行工具
+### 方式二：Gradle 插件（已适配 AGP 8.x）
+
+#### 1. 配置项目级 build.gradle
+
+在项目根目录的 `build.gradle` 文件中添加：
+
+```gradle
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+    dependencies {
+        classpath 'com.gitee.maxchou:walle-plugin:2.0.2'
+    }
+}
+```
+
+#### 2. 配置 App 模块 build.gradle
+
+在 App 模块的 `build.gradle` 中应用插件并添加依赖：
+
+```gradle
+apply plugin: 'walle'
+
+dependencies {
+    implementation 'com.gitee.maxchou:walle:2.0.2'
+}
+```
+
+#### 3. 配置插件参数
+
+```gradle
+walle {
+    // 指定渠道包的输出路径
+    apkOutputFolder = new File("${project.buildDir}/outputs/channels")
+    // 定制渠道包的APK的文件名称
+    apkFileNameFormat = '${appName}-${packageName}-${channel}-${buildType}-v${versionName}-${versionCode}.apk'
+    // 渠道配置文件
+    channelFile = new File("${project.getProjectDir()}/channel")
+}
+```
+
+**配置项说明：**
+
+- **apkOutputFolder**: 渠道包输出路径，默认为 `${project.buildDir}/outputs/apk`
+- **apkFileNameFormat**: 渠道包文件名格式，支持变量：
+  - `${projectName}` - 项目名字
+  - `${appName}` - App模块名字
+  - `${packageName}` - applicationId
+  - `${buildType}` - buildType (release/debug)
+  - `${channel}` - 渠道名称
+  - `${versionName}` - 显示版本号
+  - `${versionCode}` - 内部版本号
+  - `${buildTime}` - 编译时间
+  - `${fileSHA1}` - APK文件SHA1
+  - `${flavorName}` - productFlavors名
+- **channelFile**: 渠道配置文件路径，每行一个渠道，支持 `#` 注释
+
+#### 4. 生成渠道包
+
+```bash
+# 生成所有渠道包
+./gradlew clean assembleReleaseChannels
+
+# 生成指定 flavor 的渠道包
+./gradlew clean assembleMeituanReleaseChannels
+
+# 临时生成单个渠道
+./gradlew clean assembleReleaseChannels -PchannelList=meituan
+
+# 临时生成多个渠道
+./gradlew clean assembleReleaseChannels -PchannelList=meituan,dianping
+
+# 使用临时渠道文件
+./gradlew clean assembleReleaseChannels -PchannelFile=/path/to/channel.txt
+```
+
+#### 5. 使用 configFile 插入额外信息
+
+如果想插入除渠道外的其他信息，使用 `configFile`：
+
+```gradle
+walle {
+    // 渠道&额外信息配置文件，与channelFile互斥
+    configFile = new File("${project.getProjectDir()}/config.json")
+}
+```
+
+`config.json` 格式示例：
+
+```json
+{
+  "channel": [
+    {
+      "channel": "meituan",
+      "extra_info": {
+        "buildtime": "20260101",
+        "hash": "abc123"
+      }
+    },
+    {
+      "channel": "dianping",
+      "extra_info": {
+        "buildtime": "20260101"
+      }
+    }
+  ]
+}
+```
+
+获取额外信息：
+
+```java
+ChannelInfo channelInfo = WalleChannelReader.getChannelInfo(context);
+if (channelInfo != null) {
+    String channel = channelInfo.getChannel();
+    Map<String, String> extraInfo = channelInfo.getExtraInfo();
+}
+
+// 或直接根据key获取
+String value = WalleChannelReader.get(context, "buildtime");
+```
+
+### 方式三：命令行工具
 
 详细的 CLI 使用说明请参考：[Walle CLI 使用说明](walle-cli/README.md)
 
@@ -138,10 +263,10 @@ String buildTime = WalleChannelReader.get(context, "buildtime");
 | 模块 | 说明 |
 |------|------|
 | **library** | Android Library，提供渠道信息读取功能 |
+| **plugin** | Gradle 插件（已适配 AGP 8.x）|
 | **payload_reader** | APK Signing Block 读取模块 |
 | **payload_writer** | APK Signing Block 写入模块 |
 | **walle-cli** | 命令行工具 |
-| ~~plugin~~ | Gradle 插件（暂时禁用） |
 | app | 示例应用 |
 
 各模块的详细文档：
@@ -165,9 +290,19 @@ String buildTime = WalleChannelReader.get(context, "buildtime");
 
 请参考：[360加固失效问题](https://github.com/Meituan-Dianping/walle/wiki/360%E5%8A%A0%E5%9B%BA%E5%A4%B1%E6%95%88%EF%BC%9F)
 
-### 4. Gradle 插件什么时候支持？
+### 4. Gradle 插件支持
 
-由于 AGP 8.x 的 API 发生重大变化，Gradle 插件需要大量重构才能适配。目前推荐使用 CLI 工具或 Library 依赖方式。
+Gradle 插件已适配 AGP 8.x，可以使用以下方式集成：
+
+```gradle
+buildscript {
+    dependencies {
+        classpath 'com.gitee.maxchou:walle-plugin:2.0.2'
+    }
+}
+```
+
+详细使用说明请参考上面的“方式二：Gradle 插件”。
 
 ## 🛠️ 构建项目
 
@@ -185,7 +320,7 @@ cd walle
 ./gradlew :walle-cli:shadowJar
 
 # 发布到本地 Maven
-./gradlew :payload_reader:publishToMavenLocal :library:publishToMavenLocal
+./gradlew :payload_reader:publishToMavenLocal :library:publishToMavenLocal :plugin:publishToMavenLocal
 ```
 ## ⚡ 升级说明
 
