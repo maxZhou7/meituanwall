@@ -1,5 +1,12 @@
 apply plugin: 'java-library'
+apply plugin: 'maven-publish'
 apply from: rootProject.file('quality.gradle')
+
+// 配置 sources jar 和 javadoc jar
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -8,3 +15,15 @@ dependencies {
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
+
+// 配置发布
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = 'com.github.maxZhou7'
+            artifactId = 'payload_reader'
+            version = '2.0.0'
+        }
+    }
+}
