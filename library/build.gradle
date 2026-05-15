@@ -52,7 +52,7 @@ afterEvaluate {
                 // 坐标信息
                 groupId = 'com.gitee.maxchou'
                 artifactId = 'walle'
-                version = '2.0.7'
+                version = '2.0.8'
 
                 pom {
                     name = 'Walle Library'

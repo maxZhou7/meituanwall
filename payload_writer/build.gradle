@@ -24,7 +24,7 @@ publishing {
             from components.java
             groupId = 'com.gitee.maxchou'
             artifactId = 'payload_writer'
-            version = '2.0.7'
+            version = '2.0.8'
         }
     }
 }
