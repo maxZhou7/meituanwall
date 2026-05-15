@@ -1,15 +1,5 @@
 jdk:
   - openjdk17
 
-before_install:
-  - wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O android-cmdline-tools.zip
-  - unzip -q android-cmdline-tools.zip -d $HOME/android-sdk
-  - mkdir -p $HOME/android-sdk/cmdline-tools/latest
-  - mv $HOME/android-sdk/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest/ 2>/dev/null || true
-  - export ANDROID_HOME=$HOME/android-sdk
-  - export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
-  - yes | sdkmanager --licenses > /dev/null 2>&1 || true
-  - sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" > /dev/null 2>&1
-
 install:
-  - export ANDROID_HOME=$HOME/android-sdk && ./gradlew clean :payload_reader:publishToMavenLocal :payload_writer:publishToMavenLocal :library:publishToMavenLocal :plugin:publishToMavenLocal -x test
+  - export ANDROID_HOME=/opt/android-sdk-linux && export ANDROID_SDK_ROOT=/opt/android-sdk-linux && ./gradlew clean :payload_reader:publishToMavenLocal :payload_writer:publishToMavenLocal :library:publishToMavenLocal :plugin:publishToMavenLocal -x test
