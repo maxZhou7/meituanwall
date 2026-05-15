@@ -3,8 +3,6 @@ package com.meituan.android.walle
 import com.android.apksigner.core.ApkVerifier
 import com.android.apksigner.core.internal.util.ByteBufferDataSource
 import com.android.apksigner.core.util.DataSource
-import com.android.build.FilterData
-import com.android.build.gradle.api.BaseVariant
 import com.google.gson.Gson
 import groovy.text.SimpleTemplateEngine
 import kotlin.text.Charsets
@@ -29,7 +27,7 @@ class ChannelMaker extends DefaultTask {
     private static final String DOT_APK = ".apk";
 
     @Input
-    public BaseVariant variant;
+    public def variant;
     @Input
     public Project targetProject;
 
@@ -57,7 +55,7 @@ class ChannelMaker extends DefaultTask {
             if (!it.outputs[0].filters.isEmpty()) {
                 def tempIterator = it.outputs[0].filters.iterator();
                 while (tempIterator.hasNext()) {
-                    FilterData filterData = tempIterator.next();
+                    def filterData = tempIterator.next();
                     if (filterData.filterType == "ABI") {
                         apiIdentifier = filterData.identifier
                         break;
@@ -255,7 +253,7 @@ class ChannelMaker extends DefaultTask {
 
         String apkFileName = "${fileName}-${channelName}${DOT_APK}";
 
-        File channelApkFile = new File(apkFileName, channelOutputFolder);
+        File channelApkFile = new File(channelOutputFolder, apkFileName);
         FileUtils.copyFile(apkFile, channelApkFile);
         ChannelWriter.put(channelApkFile, channel, extraInfo)
 
@@ -265,12 +263,12 @@ class ChannelMaker extends DefaultTask {
         if (extension.apkFileNameFormat != null && extension.apkFileNameFormat.length() > 0) {
             def newApkFileName = new SimpleTemplateEngine().createTemplate(extension.apkFileNameFormat).make(nameVariantMap).toString()
             if (!newApkFileName.contentEquals(apkFileName)) {
-                channelApkFile.renameTo(new File(newApkFileName, channelOutputFolder))
+                channelApkFile.renameTo(new File(channelOutputFolder, newApkFileName))
             }
         }
     }
 
-    def checkV2Signature(File apkFile) {
+    static def checkV2Signature(File apkFile) {
         FileInputStream fIn;
         FileChannel fChan;
         try {

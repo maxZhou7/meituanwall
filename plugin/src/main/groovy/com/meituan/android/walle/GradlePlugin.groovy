@@ -1,8 +1,8 @@
 package com.meituan.android.walle
 
-import com.android.build.api.variant.AndroidComponentsExtension
-import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.AppExtension
 import org.gradle.api.GradleException
+import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 
@@ -10,7 +10,7 @@ import java.util.jar.Attributes
 import java.util.jar.JarFile
 import java.util.jar.Manifest
 
-class GradlePlugin implements org.gradle.api.Plugin<Project> {
+class GradlePlugin implements Plugin<Project> {
 
     public static final String sPluginExtensionName = "walle";
 
@@ -54,32 +54,34 @@ class GradlePlugin implements org.gradle.api.Plugin<Project> {
     void applyTask(Project project) {
         project.afterEvaluate {
             // AGP 8.x uses applicationVariants
-            def androidExt = project.extensions.findByType(com.android.build.gradle.AppExtension)
+            def androidExt = project.extensions.findByType(AppExtension)
             if (androidExt != null) {
-                androidExt.applicationVariants.all { BaseVariant variant ->
+                androidExt.applicationVariants.configureEach { variant ->
                     def variantName = variant.name.capitalize();
 
                     if (!isV2SignatureSchemeEnabled(variant)) {
                         project.logger.warn("Warning: APK Signature Scheme v2 may not be enabled for ${variant.name}.")
                     }
 
-                    ChannelMaker channelMaker = project.tasks.create("assemble${variantName}Channels", ChannelMaker);
-                    channelMaker.targetProject = project;
-                    channelMaker.variant = variant;
-                    channelMaker.setup();
+                    // Use register() instead of create() for lazy task configuration
+                    def channelMakerTask = project.tasks.register("assemble${variantName}Channels", ChannelMaker) { task ->
+                        task.targetProject = project
+                        task.variant = variant
+                        task.setup()
 
-                    // AGP 8.x compatibility
-                    try {
-                        channelMaker.dependsOn variant.assembleProvider.get()
-                    } catch (Exception e) {
-                        channelMaker.dependsOn variant.assemble
+                        // AGP 8.x compatibility
+                        try {
+                            task.dependsOn variant.assembleProvider.get()
+                        } catch (Exception e) {
+                            task.dependsOn variant.assemble
+                        }
                     }
                 }
             }
         }
     }
 
-    def getSigningConfig(BaseVariant variant) {
+    def getSigningConfig(def variant) {
         try {
             // AGP 8.x approach
             if (variant.hasProperty('signingConfig')) {
@@ -96,7 +98,7 @@ class GradlePlugin implements org.gradle.api.Plugin<Project> {
         }
     }
 
-    boolean isV2SignatureSchemeEnabled(BaseVariant variant) throws GradleException {
+    boolean isV2SignatureSchemeEnabled(def variant) throws GradleException {
         try {
             def signingConfig = getSigningConfig(variant);
             if (signingConfig == null) {

@@ -35,6 +35,7 @@ import java.util.Set;
  * {@link X509Certificate} which delegates all method invocations to the provided delegate
  * {@code X509Certificate}.
  */
+@SuppressWarnings("deprecation")
 public class DelegatingX509Certificate extends X509Certificate {
     private final X509Certificate mDelegate;
 
