@@ -2,4 +2,4 @@ jdk:
   - openjdk17
 
 install:
-  - ./gradlew clean :payload_reader:publishToMavenLocal :payload_writer:publishToMavenLocal :library:publishToMavenLocal :plugin:publishToMavenLocal -x test
+  - ./gradlew clean :payload_reader:publishToMavenLocal :payload_writer:publishToMavenLocal -x test
