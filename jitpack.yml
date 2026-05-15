@@ -6,4 +6,4 @@ before_install:
   - sdk use java 17.0.12-open
 
 install:
-  - ./gradlew clean :payload_reader:assemble :library:publishToMavenLocal -x test
+  - ./gradlew clean :payload_reader:publishToMavenLocal :library:publishToMavenLocal -x test
