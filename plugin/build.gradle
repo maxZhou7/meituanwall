@@ -19,6 +19,9 @@ dependencies {
     implementation libs.json.v20251224
     implementation project(':payload_writer')
     implementation libs.gson
+    implementation libs.guava
+    implementation libs.bcpkix.jdk18on
+    implementation libs.bcprov.jdk18on
 }
 
 // Configure publishing
@@ -33,7 +36,7 @@ publishing {
             from components.java
             groupId = 'com.gitee.maxchou'
             artifactId = 'walle-plugin'
-            version = '2.0.10'
+            version = '2.0.11'
             
             pom {
                 name = 'Walle Gradle Plugin'

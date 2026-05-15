@@ -42,8 +42,8 @@ import java.util.jar.Manifest;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROutputStream;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
@@ -481,7 +481,7 @@ public abstract class V1SchemeSigner {
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             try (ASN1InputStream asn1 = new ASN1InputStream(sigData.getEncoded())) {
-                DEROutputStream dos = new DEROutputStream(out);
+                ASN1OutputStream dos = ASN1OutputStream.create(out);
                 dos.writeObject(asn1.readObject());
             }
             return out.toByteArray();
