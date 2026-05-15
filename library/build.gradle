@@ -52,7 +52,7 @@ afterEvaluate {
                 // 坐标信息
                 groupId = 'com.github.maxZhou7'
                 artifactId = 'walle'
-                version = '2.0.0'
+                version = '2.0.1'
 
                 pom {
                     name = 'Walle Library'
