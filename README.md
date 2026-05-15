@@ -5,7 +5,7 @@
 > **原始项目**: https://github.com/Meituan-Dianping/walle  
 > **技术文章**: [美团Android新一代渠道包生成工具](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)
 
-[![Release Version](https://img.shields.io/badge/release-2.0.2-blue.svg)](https://gitee.com/maxchou/walle/releases)
+[![Release Version](https://img.shields.io/badge/release-2.0.3-blue.svg)](https://gitee.com/maxchou/walle/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
 
@@ -45,7 +45,7 @@ dependencyResolutionManagement {
 
 ```gradle
 dependencies {
-    implementation 'com.gitee.maxchou:walle:2.0.2'
+    implementation 'com.gitee.maxchou:walle:2.0.3'
 }
 ```
 
@@ -82,7 +82,7 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.gitee.maxchou:walle-plugin:2.0.2'
+        classpath 'com.gitee.maxchou:walle-plugin:2.0.3'
     }
 }
 ```
@@ -95,7 +95,7 @@ buildscript {
 apply plugin: 'walle'
 
 dependencies {
-    implementation 'com.gitee.maxchou:walle:2.0.2'
+    implementation 'com.gitee.maxchou:walle:2.0.3'
 }
 ```
 
@@ -260,14 +260,50 @@ String buildTime = WalleChannelReader.get(context, "buildtime");
 
 本项目包含以下模块：
 
-| 模块 | 说明 |
-|------|------|
-| **library** | Android Library，提供渠道信息读取功能 |
-| **plugin** | Gradle 插件（已适配 AGP 8.x）|
-| **payload_reader** | APK Signing Block 读取模块 |
-| **payload_writer** | APK Signing Block 写入模块 |
-| **walle-cli** | 命令行工具 |
-| app | 示例应用 |
+| 模块 | Maven 坐标 | 说明 |
+|------|-----------|------|
+| **library** | `com.gitee.maxchou:walle:2.0.3` | Android Library，提供渠道信息读取功能 |
+| **plugin** | `com.gitee.maxchou:walle-plugin:2.0.3` | Gradle 插件（已适配 AGP 8.x）|
+| **payload_reader** | `com.gitee.maxchou:payload_reader:2.0.3` | APK Signing Block 读取模块 |
+| **payload_writer** | `com.gitee.maxchou:payload_writer:2.0.3` | APK Signing Block 写入模块 |
+| **walle-cli** | - | 命令行工具 |
+| app | - | 示例应用 |
+
+### 单独引用模块
+
+如果你只需要使用特定的功能，可以单独引用对应的模块：
+
+#### 1. 只使用读取功能
+
+```gradle
+dependencies {
+    implementation 'com.gitee.maxchou:payload_reader:2.0.3'
+}
+```
+
+适用场景：只需要读取 APK 中的渠道信息，不需要写入。
+
+#### 2. 只使用写入功能
+
+```gradle
+dependencies {
+    implementation 'com.gitee.maxchou:payload_writer:2.0.3'
+}
+```
+
+注意：`payload_writer` 会自动依赖 `payload_reader`。
+
+适用场景：需要在服务端或工具中写入渠道信息到 APK。
+
+#### 3. 完整的 Android Library
+
+```gradle
+dependencies {
+    implementation 'com.gitee.maxchou:walle:2.0.3'
+}
+```
+
+这是最常用的方式，包含了读取功能，并且自动处理了所有依赖。
 
 各模块的详细文档：
 - [Payload Reader 使用说明](payload_reader/README.md)
@@ -297,7 +333,7 @@ Gradle 插件已适配 AGP 8.x，可以使用以下方式集成：
 ```gradle
 buildscript {
     dependencies {
-        classpath 'com.gitee.maxchou:walle-plugin:2.0.2'
+        classpath 'com.gitee.maxchou:walle-plugin:2.0.3'
     }
 }
 ```
