@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    id 'maven-publish'
 }
 
 apply from: rootProject.file('quality.gradle')
@@ -12,6 +13,9 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+
+        // 消费者规则（如果需要）
+        consumerProguardFiles 'consumer-rules.pro'
     }
 
     buildTypes {
@@ -30,8 +34,56 @@ android {
         warningsAsErrors true
         disable 'GradleDependency'
     }
-}
 
+    // 生成 sources jar 和 javadoc jar
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
+}
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+
+                // 坐标信息
+                groupId = 'com.github.maxZhou7'
+                artifactId = 'walle'
+                version = '2.0.0'
+
+                pom {
+                    name = 'Walle Library'
+                    description = 'Android APK Signature V2 Scheme channel reader and writer'
+                    url = 'https://github.com/maxZhou7/meituanwall'
+
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'maxZhou7'
+                            name = 'maxZhou7'
+                            email = 'maxzhou7@gmail.com'
+                        }
+                    }
+
+                    scm {
+                        connection = 'scm:git:github.com/maxZhou7/meituanwall.git'
+                        developerConnection = 'scm:git:ssh://github.com/maxZhou7/meituanwall.git'
+                        url = 'https://github.com/maxZhou7/meituanwall'
+                    }
+                }
+            }
+        }
+    }
+}
 configurations.configureEach {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
