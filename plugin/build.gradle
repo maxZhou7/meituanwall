@@ -24,19 +24,29 @@ dependencies {
     implementation libs.bcprov.jdk18on
 }
 
-// Configure publishing
-java {
-    withSourcesJar()
-    withJavadocJar()
+// Configure publishing for Gradle Plugin
+tasks.register('sourcesJar', Jar) {
+    archiveClassifier.set('sources')
+    from sourceSets.main.allSource
+}
+
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            groupId = 'com.github.maxZhou7'
+        pluginMaven(MavenPublication) {
             artifactId = 'walle-plugin'
-            version = '2.0.13'
+            groupId = 'com.github.maxZhou7'
+            version = '2.0.14'
+            
+            from components.java
+            
+            artifact sourcesJar
+            artifact javadocJar
             
             pom {
                 name = 'Walle Gradle Plugin'
