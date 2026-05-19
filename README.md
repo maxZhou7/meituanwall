@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
 
-## 📖 Project Overview
+## 馃摉 Project Overview
 
 Walle is a next-generation channel package builder for Android under the Android Signature V2 Scheme.
 
@@ -24,16 +24,17 @@ We provide multiple usage methods:
 * **Gradle Plugin Method** - Convenient integration, automated packaging
 * **Command Line Tool Method** - Flexible, supports custom requirements
 
+> ⚠️ **Important**: All dependencies are hosted on [JitPack](https://jitpack.io/#maxZhou7/meituanwall). Make sure to add `maven { url 'https://jitpack.io' }` to your repositories.
+
 ### Method 1: Library Dependency (Recommended)
 
-> 💡 **Tip**: Before using JitPack dependencies for the first time, visit [JitPack](https://jitpack.io/#maxZhou7/meituanwall) and trigger a build for version `v2.0.15` to ensure availability.
+#### Step 1: Add JitPack Repository
 
-#### 1. Add JitPack Repository
-
-Add to `settings.gradle` or `build.gradle` in the project root directory:
+**For modern Gradle (7.0+)** - Add to `settings.gradle`:
 
 ```gradle
 dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
@@ -42,17 +43,29 @@ dependencyResolutionManagement {
 }
 ```
 
-#### 2. Add Dependencies
-
-Add to `build.gradle` in the App module:
+**For older Gradle versions** - Add to project-level `build.gradle`:
 
 ```gradle
-dependencies {
-    implementation 'com.github.maxZhou7:walle:2.0.15'
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
 }
 ```
 
-#### 3. Get Channel Information
+#### Step 2: Add Dependency
+
+Add to App module's `build.gradle`:
+
+```gradle
+dependencies {
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.15'
+}
+```
+
+#### Step 3: Get Channel Information
 
 ```java
 import com.meituan.android.walle.WalleChannelReader;
@@ -85,7 +98,7 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.github.maxZhou7:walle-plugin:2.0.15'
+        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.15'
     }
 }
 ```
@@ -98,7 +111,7 @@ Apply plugin and add dependencies in the App module's `build.gradle`:
 apply plugin: 'walle'
 
 dependencies {
-    implementation 'com.github.maxZhou7:walle:2.0.15'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.15'
 }
 ```
 
@@ -213,7 +226,7 @@ java -jar walle-cli-all.jar put -c meituan app-release.apk app-release-meituan.a
 java -jar walle-cli-all.jar batch -f channel.txt app-release.apk output/
 ```
 
-## 📦 Generate Channel Packages
+## 馃摝 Generate Channel Packages
 
 ### Batch Generate Using CLI Tool
 
@@ -235,7 +248,7 @@ java -jar walle-cli-all.jar batch -f channel.txt app-release.apk channels/
 java -jar walle-cli-all.jar show channels/app-release-meituan.apk
 ```
 
-## 🔧 Advanced Usage
+## 馃敡 Advanced Usage
 
 ### Insert Extra Information
 
@@ -259,16 +272,16 @@ Map<String, String> extraInfo = WalleChannelReader.getExtraInfo(context);
 String buildTime = WalleChannelReader.get(context, "buildtime");
 ```
 
-## 📚 Module Descriptions
+## 馃摎 Module Descriptions
 
 This project contains the following modules:
 
 | Module | Maven Coordinates | Description |
 |------|-----------|------|
-| **library** | `com.github.maxZhou7:walle:2.0.15` | Android Library, provides channel information reading functionality |
-| **plugin** | `com.github.maxZhou7:walle-plugin:2.0.15` | Gradle plugin (adapted for AGP 8.x) |
-| **payload_reader** | `com.github.maxZhou7:payload_reader:2.0.15` | APK Signing Block reading module |
-| **payload_writer** | `com.github.maxZhou7:payload_writer:2.0.15` | APK Signing Block writing module |
+| **library** | `com.github.maxZhou7.meituanwall:walle:2.0.15` | Android Library, provides channel information reading functionality |
+| **plugin** | `com.github.maxZhou7.meituanwall:walle-plugin:2.0.15` | Gradle plugin (adapted for AGP 8.x) |
+| **payload_reader** | `com.github.maxZhou7.meituanwall:payload_reader:2.0.15` | APK Signing Block reading module |
+| **payload_writer** | `com.github.maxZhou7.meituanwall:payload_writer:2.0.15` | APK Signing Block writing module |
 | **walle-cli** | - | Command line tool |
 | app | - | Sample application |
 
@@ -280,7 +293,7 @@ If you only need to use specific functionality, you can reference the correspond
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:payload_reader:2.0.15'
+    implementation 'com.github.maxZhou7.meituanwall:payload_reader:2.0.15'
 }
 ```
 
@@ -290,7 +303,7 @@ Applicable scenarios: Only need to read channel information from APKs, no writin
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:payload_writer:2.0.15'
+    implementation 'com.github.maxZhou7.meituanwall:payload_writer:2.0.15'
 }
 ```
 
@@ -302,7 +315,7 @@ Applicable scenarios: Need to write channel information to APKs on the server si
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:walle:2.0.15'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.15'
 }
 ```
 
@@ -313,7 +326,7 @@ Detailed documentation for each module:
 - [Payload Writer Usage Instructions](payload_writer/README.md)
 - [Walle CLI Usage Instructions](walle-cli/README.md)
 
-## �?FAQ
+## 鉂?FAQ
 
 ### 1. Why Choose Walle?
 
@@ -336,7 +349,7 @@ The Gradle plugin has been adapted for AGP 8.x and can be integrated using the f
 ```gradle
 buildscript {
     dependencies {
-        classpath 'com.github.maxZhou7:walle-plugin:2.0.15'
+        classpath 'com.github.maxZhou7.meituanwall:plugin:2.0.15'
     }
 }
 ```
@@ -374,7 +387,7 @@ rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.maxZhou7
 
 If v2.0.15 hasn't been built yet, try using a previously built version like `v2.0.12`.
 
-## 🛠�?Build Project
+## 馃洜锔?Build Project
 
 If you want to build the project yourself:
 
@@ -393,7 +406,7 @@ cd walle
 ./gradlew :payload_reader:publishToMavenLocal :library:publishToMavenLocal :plugin:publishToMavenLocal
 ```
 
-## 🔄 Upgrade Notes
+## 馃攧 Upgrade Notes
 
 ### Current Upgrade Content
 
@@ -434,19 +447,19 @@ This project has undergone comprehensive modernization upgrades based on the ori
 - **Gradle Version**: 8.13+
 - **AGP Version**: 8.8.0+
 
-> ⚠️ **Note**: Due to API changes in AGP 8.x, the Gradle plugin functionality is temporarily disabled. It is recommended to use the CLI tool or Library dependency method.
+> 鈿狅笍 **Note**: Due to API changes in AGP 8.x, the Gradle plugin functionality is temporarily disabled. It is recommended to use the CLI tool or Library dependency method.
 
 
-## 🤝 Contribution Guidelines
+## 馃� Contribution Guidelines
 
 This project welcomes contributions in any form:
 
-- 🐛 Submit bug reports
-- 💡 Propose new feature suggestions
-- 📝 Improve documentation
-- 🔧 Submit code fixes
+- 馃悰 Submit bug reports
+- 馃挕 Propose new feature suggestions
+- 馃摑 Improve documentation
+- 馃敡 Submit code fixes
 
-## 📄 License
+## 馃搫 License
 
 ```
 Copyright 2017 Meituan-Dianping
@@ -465,7 +478,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-## 🙏 Acknowledgments
+## 馃檹 Acknowledgments
 
 - **Original Project**: [Meituan-Dianping Walle](https://github.com/Meituan-Dianping/walle)
 - **Technical Support**: [Meituan Technical Team](http://tech.meituan.com/)
