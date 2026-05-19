@@ -5,7 +5,8 @@
 > **Original Project**: https://github.com/Meituan-Dianping/walle  
 > **Technical Article**: [Meituan's New Generation Android Channel Package Tool](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)
 
-[![Release Version](https://img.shields.io/badge/release-2.0.13-blue.svg)](https://gitee.com/maxchou/walle/releases)
+[![Release Version](https://img.shields.io/badge/release-2.0.13-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
+[![JitPack](https://jitpack.io/v/maxZhou7/meituanwall.svg)](https://jitpack.io/#maxZhou7/meituanwall)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
 
@@ -24,6 +25,8 @@ We provide multiple usage methods:
 * **Command Line Tool Method** - Flexible, supports custom requirements
 
 ### Method 1: Library Dependency (Recommended)
+
+> 💡 **Tip**: Before using JitPack dependencies for the first time, visit [JitPack](https://jitpack.io/#maxZhou7/meituanwall) and trigger a build for version `v2.0.13` to ensure availability.
 
 #### 1. Add JitPack Repository
 
@@ -340,13 +343,44 @@ buildscript {
 
 For detailed usage instructions, please refer to "Method 2: Gradle Plugin" above.
 
+### 5. JitPack Dependency Issues (401 Unauthorized)
+
+If you encounter a `401 Unauthorized` error when fetching dependencies from JitPack:
+
+**Solution 1: Manually Trigger JitPack Build**
+
+1. Visit [JitPack](https://jitpack.io/#maxZhou7/meituanwall)
+2. Enter version tag: `v2.0.13`
+3. Click "Get it" button to trigger build
+4. Wait for build completion (usually takes a few minutes)
+5. Check build log for success status
+
+**Solution 2: Verify Repository is Public**
+
+Ensure your GitHub repository https://github.com/maxZhou7/meituanwall is set to **Public**. Private repositories require authentication.
+
+**Solution 3: Clear Gradle Cache**
+
+```bash
+# Clear Gradle cache
+./gradlew clean
+rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.maxZhou7
+
+# Re-sync project
+./gradlew --refresh-dependencies
+```
+
+**Solution 4: Use Alternative Version**
+
+If v2.0.13 hasn't been built yet, try using a previously built version like `v2.0.12`.
+
 ## 🛠️ Build Project
 
 If you want to build the project yourself:
 
 ```bash
 # Clone the project
-git clone https://gitee.com/maxchou/walle.git
+git clone https://github.com/maxZhou7/meituanwall.git
 cd walle
 
 # Clean and build
@@ -441,6 +475,6 @@ limitations under the License.
 
 ---
 
-**Current Maintainer**: [@maxchou](https://gitee.com/maxchou)  
-**Project Address**: https://gitee.com/maxchou/walle  
+**Current Maintainer**: [@maxchou](https://github.com/maxZhou7)  
+**Project Address**: https://github.com/maxZhou7/meituanwall
 **Original Project**: https://github.com/Meituan-Dianping/walle

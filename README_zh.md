@@ -5,7 +5,8 @@
 > **原始项目**: https://github.com/Meituan-Dianping/walle  
 > **技术文章**: [美团Android新一代渠道包生成工具](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)
 
-[![Release Version](https://img.shields.io/badge/release-2.0.12-blue.svg)](https://gitee.com/maxchou/walle/releases)
+[![Release Version](https://img.shields.io/badge/release-2.0.13-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
+[![JitPack](https://jitpack.io/v/maxZhou7/meituanwall.svg)](https://jitpack.io/#maxZhou7/meituanwall)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
 
@@ -24,6 +25,8 @@ Walle（瓦力）是 Android Signature V2 Scheme 签名下的新一代渠道包�
 * **命令行工具方式** - 灵活，支持自定义需求
 
 ### 方式一：Library 依赖（推荐）
+
+> 💡 **提示**: 首次使用 JitPack 依赖前，建议访问 [JitPack](https://jitpack.io/#maxZhou7/meituanwall) 手动触发 `v2.0.13` 版本的构建，以确保依赖可用。
 
 #### 1. 添加 JitPack 仓库
 
@@ -45,7 +48,7 @@ dependencyResolutionManagement {
 
 ```gradle
 dependencies {
-    implementation 'com.gitee.maxchou:walle:2.0.12'
+    implementation 'com.github.maxZhou7:walle:2.0.13'
 }
 ```
 
@@ -82,7 +85,7 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.gitee.maxchou:walle-plugin:2.0.12'
+        classpath 'com.github.maxZhou7:walle-plugin:2.0.13'
     }
 }
 ```
@@ -95,7 +98,7 @@ buildscript {
 apply plugin: 'walle'
 
 dependencies {
-    implementation 'com.gitee.maxchou:walle:2.0.12'
+    implementation 'com.github.maxZhou7:walle:2.0.13'
 }
 ```
 
@@ -262,10 +265,10 @@ String buildTime = WalleChannelReader.get(context, "buildtime");
 
 | 模块 | Maven 坐标 | 说明 |
 |------|-----------|------|
-| **library** | `com.gitee.maxchou:walle:2.0.12` | Android Library，提供渠道信息读取功能 |
-| **plugin** | `com.gitee.maxchou:walle-plugin:2.0.12` | Gradle 插件（已适配 AGP 8.x）|
-| **payload_reader** | `com.gitee.maxchou:payload_reader:2.0.12` | APK Signing Block 读取模块 |
-| **payload_writer** | `com.gitee.maxchou:payload_writer:2.0.12` | APK Signing Block 写入模块 |
+| **library** | `com.github.maxZhou7:walle:2.0.13` | Android Library，提供渠道信息读取功能 |
+| **plugin** | `com.github.maxZhou7:walle-plugin:2.0.13` | Gradle 插件（已适配 AGP 8.x）|
+| **payload_reader** | `com.github.maxZhou7:payload_reader:2.0.13` | APK Signing Block 读取模块 |
+| **payload_writer** | `com.github.maxZhou7:payload_writer:2.0.13` | APK Signing Block 写入模块 |
 | **walle-cli** | - | 命令行工具 |
 | app | - | 示例应用 |
 
@@ -277,7 +280,7 @@ String buildTime = WalleChannelReader.get(context, "buildtime");
 
 ```gradle
 dependencies {
-    implementation 'com.gitee.maxchou:payload_reader:2.0.12'
+    implementation 'com.github.maxZhou7:payload_reader:2.0.13'
 }
 ```
 
@@ -287,7 +290,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.gitee.maxchou:payload_writer:2.0.12'
+    implementation 'com.github.maxZhou7:payload_writer:2.0.13'
 }
 ```
 
@@ -299,7 +302,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.gitee.maxchou:walle:2.0.12'
+    implementation 'com.github.maxZhou7:walle:2.0.13'
 }
 ```
 
@@ -333,12 +336,43 @@ Gradle 插件已适配 AGP 8.x，可以使用以下方式集成：
 ```gradle
 buildscript {
     dependencies {
-        classpath 'com.gitee.maxchou:walle-plugin:2.0.12'
+        classpath 'com.github.maxZhou7:walle-plugin:2.0.13'
     }
 }
 ```
 
 详细使用说明请参考上面的"方式二：Gradle 插件"。
+
+### 5. JitPack 依赖问题（401 Unauthorized）
+
+如果从 JitPack 获取依赖时遇到 `401 Unauthorized` 错误：
+
+**解决方案 1：手动触发 JitPack 构建**
+
+1. 访问 [JitPack](https://jitpack.io/#maxZhou7/meituanwall)
+2. 输入版本号：`v2.0.13`
+3. 点击 "Get it" 按钮触发构建
+4. 等待构建完成（通常需要几分钟）
+5. 查看构建日志确认成功状态
+
+**解决方案 2：确认仓库为公开状态**
+
+确保你的 GitHub 仓库 https://github.com/maxZhou7/meituanwall 设置为 **Public（公开）**。私有仓库需要认证。
+
+**解决方案 3：清除 Gradle 缓存**
+
+```bash
+# 清除 Gradle 缓存
+./gradlew clean
+rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.maxZhou7
+
+# 重新同步项目
+./gradlew --refresh-dependencies
+```
+
+**解决方案 4：使用其他版本**
+
+如果 v2.0.13 尚未构建，可以尝试使用之前已构建的版本，如 `v2.0.12`。
 
 ## 🛠️ 构建项目
 
@@ -346,7 +380,7 @@ buildscript {
 
 ```bash
 # 克隆项目
-git clone https://gitee.com/maxchou/walle.git
+git clone https://github.com/maxZhou7/meituanwall.git
 cd walle
 
 # 清理并构建
@@ -441,6 +475,6 @@ limitations under the License.
 
 ---
 
-**当前维护者**: [@maxchou](https://gitee.com/maxchou)  
-**项目地址**: https://gitee.com/maxchou/walle  
+**当前维护者**: [@maxZhou7](https://github.com/maxZhou7)  
+**项目地址**: https://github.com/maxZhou7/meituanwall  
 **原始项目**: https://github.com/Meituan-Dianping/walle
