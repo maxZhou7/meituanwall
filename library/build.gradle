@@ -50,14 +50,14 @@ afterEvaluate {
                 from components.release
 
                 // 坐标信息
-                groupId = 'com.gitee.maxchou'
+                groupId = 'com.github.maxZhou7'
                 artifactId = 'walle'
-                version = '2.0.12'
+                version = '2.0.13'
 
                 pom {
                     name = 'Walle Library'
                     description = 'Android APK Signature V2 Scheme channel reader and writer'
-                    url = 'https://gitee.com/maxchou/walle'
+                    url = 'https://github.com/maxZhou7/meituanwall'
 
                     licenses {
                         license {
@@ -68,16 +68,16 @@ afterEvaluate {
 
                     developers {
                         developer {
-                            id = 'maxchou'
-                            name = 'maxchou'
-                            email = '343095962@qq.com'
+                            id = 'maxzhou'
+                            name = 'maxzhou'
+                            email = 'maxzhou7@gamil.com'
                         }
                     }
 
                     scm {
-                        connection = 'scm:git:gitee.com/maxchou/walle.git'
-                        developerConnection = 'scm:git:ssh://gitee.com/maxchou/walle.git'
-                        url = 'https://gitee.com/maxchou/walle'
+                        connection = 'scm:git:git://github.com/maxZhou7/meituanwall.git'
+                        developerConnection = 'scm:git:ssh://github.com/maxZhou7/meituanwall.git'
+                        url = 'https://github.com/maxZhou7/meituanwall'
                     }
                 }
             }
