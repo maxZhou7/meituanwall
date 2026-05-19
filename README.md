@@ -5,7 +5,7 @@
 > **Original Project**: https://github.com/Meituan-Dianping/walle  
 > **Technical Article**: [Meituan's New Generation Android Channel Package Tool](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)
 
-[![Release Version](https://img.shields.io/badge/release-2.0.14-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
+[![Release Version](https://img.shields.io/badge/release-2.0.15-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
 [![JitPack](https://jitpack.io/v/maxZhou7/meituanwall.svg)](https://jitpack.io/#maxZhou7/meituanwall)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
@@ -26,7 +26,7 @@ We provide multiple usage methods:
 
 ### Method 1: Library Dependency (Recommended)
 
-> 💡 **Tip**: Before using JitPack dependencies for the first time, visit [JitPack](https://jitpack.io/#maxZhou7/meituanwall) and trigger a build for version `v2.0.14` to ensure availability.
+> 💡 **Tip**: Before using JitPack dependencies for the first time, visit [JitPack](https://jitpack.io/#maxZhou7/meituanwall) and trigger a build for version `v2.0.15` to ensure availability.
 
 #### 1. Add JitPack Repository
 
@@ -48,7 +48,7 @@ Add to `build.gradle` in the App module:
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:walle:2.0.14'
+    implementation 'com.github.maxZhou7:walle:2.0.15'
 }
 ```
 
@@ -85,7 +85,7 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.github.maxZhou7:walle-plugin:2.0.14'
+        classpath 'com.github.maxZhou7:walle-plugin:2.0.15'
     }
 }
 ```
@@ -98,7 +98,7 @@ Apply plugin and add dependencies in the App module's `build.gradle`:
 apply plugin: 'walle'
 
 dependencies {
-    implementation 'com.github.maxZhou7:walle:2.0.14'
+    implementation 'com.github.maxZhou7:walle:2.0.15'
 }
 ```
 
@@ -265,10 +265,10 @@ This project contains the following modules:
 
 | Module | Maven Coordinates | Description |
 |------|-----------|------|
-| **library** | `com.github.maxZhou7:walle:2.0.14` | Android Library, provides channel information reading functionality |
-| **plugin** | `com.github.maxZhou7:walle-plugin:2.0.14` | Gradle plugin (adapted for AGP 8.x) |
-| **payload_reader** | `com.github.maxZhou7:payload_reader:2.0.14` | APK Signing Block reading module |
-| **payload_writer** | `com.github.maxZhou7:payload_writer:2.0.14` | APK Signing Block writing module |
+| **library** | `com.github.maxZhou7:walle:2.0.15` | Android Library, provides channel information reading functionality |
+| **plugin** | `com.github.maxZhou7:walle-plugin:2.0.15` | Gradle plugin (adapted for AGP 8.x) |
+| **payload_reader** | `com.github.maxZhou7:payload_reader:2.0.15` | APK Signing Block reading module |
+| **payload_writer** | `com.github.maxZhou7:payload_writer:2.0.15` | APK Signing Block writing module |
 | **walle-cli** | - | Command line tool |
 | app | - | Sample application |
 
@@ -280,7 +280,7 @@ If you only need to use specific functionality, you can reference the correspond
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:payload_reader:2.0.14'
+    implementation 'com.github.maxZhou7:payload_reader:2.0.15'
 }
 ```
 
@@ -290,7 +290,7 @@ Applicable scenarios: Only need to read channel information from APKs, no writin
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:payload_writer:2.0.14'
+    implementation 'com.github.maxZhou7:payload_writer:2.0.15'
 }
 ```
 
@@ -302,7 +302,7 @@ Applicable scenarios: Need to write channel information to APKs on the server si
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:walle:2.0.14'
+    implementation 'com.github.maxZhou7:walle:2.0.15'
 }
 ```
 
@@ -336,7 +336,7 @@ The Gradle plugin has been adapted for AGP 8.x and can be integrated using the f
 ```gradle
 buildscript {
     dependencies {
-        classpath 'com.github.maxZhou7:walle-plugin:2.0.14'
+        classpath 'com.github.maxZhou7:walle-plugin:2.0.15'
     }
 }
 ```
@@ -350,7 +350,7 @@ If you encounter a `401 Unauthorized` error when fetching dependencies from JitP
 **Solution 1: Manually Trigger JitPack Build**
 
 1. Visit [JitPack](https://jitpack.io/#maxZhou7/meituanwall)
-2. Enter version tag: `v2.0.14`
+2. Enter version tag: `v2.0.15`
 3. Click "Get it" button to trigger build
 4. Wait for build completion (usually takes a few minutes)
 5. Check build log for success status
@@ -372,7 +372,7 @@ rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.maxZhou7
 
 **Solution 4: Use Alternative Version**
 
-If v2.0.14 hasn't been built yet, try using a previously built version like `v2.0.12`.
+If v2.0.15 hasn't been built yet, try using a previously built version like `v2.0.12`.
 
 ## 🛠�?Build Project
 

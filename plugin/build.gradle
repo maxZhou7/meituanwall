@@ -41,7 +41,7 @@ publishing {
         pluginMaven(MavenPublication) {
             artifactId = 'walle-plugin'
             groupId = 'com.github.maxZhou7'
-            version = '2.0.14'
+            version = '2.0.15'
             
             from components.java
             
@@ -62,9 +62,9 @@ publishing {
                 
                 developers {
                     developer {
-                        id = 'maxchou'
-                        name = 'maxchou'
-                        email = '343095962@qq.com'
+                        id = 'maxzhou'
+                        name = 'maxzhou'
+                        email = 'maxzhou7@gamil.com'
                     }
                 }
                 

@@ -3,7 +3,7 @@
 > **原始项目**: https://github.com/Meituan-Dianping/walle  
 > **技术文�?*: [美团Android新一代渠道包生成工具](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)
 
-[![Release Version](https://img.shields.io/badge/release-2.0.14-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
+[![Release Version](https://img.shields.io/badge/release-2.0.15-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
 [![JitPack](https://jitpack.io/v/maxZhou7/meituanwall.svg)](https://jitpack.io/#maxZhou7/meituanwall)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
@@ -18,7 +18,7 @@ Walle（瓦力）�?Android Signature V2 Scheme 签名下的新一代渠道包�
 * **命令行工具方�?* - 灵活，支持自定义需�?
 ### 方式一：Library 依赖（推荐）
 
-> 💡 **提示**: 首次使用 JitPack 依赖前，建议访问 [JitPack](https://jitpack.io/#maxZhou7/meituanwall) 手动触发 `v2.0.14` 版本的构建，以确保依赖可用�?
+> 💡 **提示**: 首次使用 JitPack 依赖前，建议访问 [JitPack](https://jitpack.io/#maxZhou7/meituanwall) 手动触发 `v2.0.15` 版本的构建，以确保依赖可用�?
 #### 1. 添加 JitPack 仓库
 
 在项目根目录�?`settings.gradle` �?`build.gradle` 中添加：
@@ -39,7 +39,7 @@ dependencyResolutionManagement {
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:walle:2.0.14'
+    implementation 'com.github.maxZhou7:walle:2.0.15'
 }
 ```
 
@@ -75,7 +75,7 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.github.maxZhou7:walle-plugin:2.0.14'
+        classpath 'com.github.maxZhou7:walle-plugin:2.0.15'
     }
 }
 ```
@@ -87,7 +87,7 @@ buildscript {
 apply plugin: 'walle'
 
 dependencies {
-    implementation 'com.github.maxZhou7:walle:2.0.14'
+    implementation 'com.github.maxZhou7:walle:2.0.15'
 }
 ```
 
@@ -242,10 +242,10 @@ java -jar walle-cli-all.jar put \
 
 | 模块 | Maven 坐标 | 说明 |
 |------|-----------|------|
-| **library** | `com.github.maxZhou7:walle:2.0.14` | Android Library，提供渠道信息读取功�?|
-| **plugin** | `com.github.maxZhou7:walle-plugin:2.0.14` | Gradle 插件（已适配 AGP 8.x）|
-| **payload_reader** | `com.github.maxZhou7:payload_reader:2.0.14` | APK Signing Block 读取模块 |
-| **payload_writer** | `com.github.maxZhou7:payload_writer:2.0.14` | APK Signing Block 写入模块 |
+| **library** | `com.github.maxZhou7:walle:2.0.15` | Android Library，提供渠道信息读取功�?|
+| **plugin** | `com.github.maxZhou7:walle-plugin:2.0.15` | Gradle 插件（已适配 AGP 8.x）|
+| **payload_reader** | `com.github.maxZhou7:payload_reader:2.0.15` | APK Signing Block 读取模块 |
+| **payload_writer** | `com.github.maxZhou7:payload_writer:2.0.15` | APK Signing Block 写入模块 |
 | **walle-cli** | - | 命令行工�?|
 | app | - | 示例应用 |
 
@@ -255,7 +255,7 @@ java -jar walle-cli-all.jar put \
 #### 1. 只使用读取功�?
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:payload_reader:2.0.14'
+    implementation 'com.github.maxZhou7:payload_reader:2.0.15'
 }
 ```
 
@@ -263,7 +263,7 @@ dependencies {
 #### 2. 只使用写入功�?
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:payload_writer:2.0.14'
+    implementation 'com.github.maxZhou7:payload_writer:2.0.15'
 }
 ```
 
@@ -273,7 +273,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7:walle:2.0.14'
+    implementation 'com.github.maxZhou7:walle:2.0.15'
 }
 ```
 
@@ -301,7 +301,7 @@ Gradle 插件已适配 AGP 8.x，可以使用以下方式集成：
 ```gradle
 buildscript {
     dependencies {
-        classpath 'com.github.maxZhou7:walle-plugin:2.0.14'
+        classpath 'com.github.maxZhou7:walle-plugin:2.0.15'
     }
 }
 ```
@@ -312,7 +312,7 @@ buildscript {
 **解决方案 1：手动触�?JitPack 构建**
 
 1. 访问 [JitPack](https://jitpack.io/#maxZhou7/meituanwall)
-2. 输入版本号：`v2.0.14`
+2. 输入版本号：`v2.0.15`
 3. 点击 "Get it" 按钮触发构建
 4. 等待构建完成（通常需要几分钟�?5. 查看构建日志确认成功状�?
 **解决方案 2：确认仓库为公开状�?*
@@ -331,7 +331,7 @@ rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.maxZhou7
 
 **解决方案 4：使用其他版�?*
 
-如果 v2.0.14 尚未构建，可以尝试使用之前已构建的版本，�?`v2.0.12`�?
+如果 v2.0.15 尚未构建，可以尝试使用之前已构建的版本，�?`v2.0.12`�?
 ## 🛠�?构建项目
 
 如果你想自己构建项目�?
