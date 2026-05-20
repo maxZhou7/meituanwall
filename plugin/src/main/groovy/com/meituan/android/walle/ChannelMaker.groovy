@@ -16,10 +16,10 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.hash.HashCode
 import org.gradle.internal.hash.HashFunction
 import org.gradle.internal.hash.Hashing
-import org.gradle.internal.impldep.com.google.common.io.Files
 
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import java.security.MessageDigest
 import java.text.SimpleDateFormat
 
 class ChannelMaker extends DefaultTask {
@@ -308,7 +308,11 @@ class ChannelMaker extends DefaultTask {
         if (file.isDirectory()) {
             hashCode = hashFunction.hashString(file.getPath(), Charsets.UTF_16LE);
         } else {
-            hashCode = Files.hash(file, hashFunction);
+            // Use standard Java API instead of Gradle internal Guava
+            MessageDigest digest = MessageDigest.getInstance("SHA-1")
+            byte[] fileBytes = FileUtils.readFileToByteArray(file)
+            byte[] hashBytes = digest.digest(fileBytes)
+            hashCode = hashFunction.hashBytes(hashBytes)
         }
         return hashCode.toString();
     }

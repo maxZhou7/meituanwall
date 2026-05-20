@@ -160,15 +160,15 @@ final class ApkUtil {
         final ByteBuffer footer = ByteBuffer.allocate(24);
         fileChannel.read(footer);
         footer.order(ByteOrder.LITTLE_ENDIAN);
-        if ((footer.getLong(8) != APK_SIG_BLOCK_MAGIC_LO)
-                || (footer.getLong(16) != APK_SIG_BLOCK_MAGIC_HI)) {
+        if (footer.getLong(8) != APK_SIG_BLOCK_MAGIC_LO
+                || footer.getLong(16) != APK_SIG_BLOCK_MAGIC_HI) {
             throw new SignatureNotFoundException(
                     "No APK Signing Block before ZIP Central Directory");
         }
         // Read and compare size fields
         final long apkSigBlockSizeInFooter = footer.getLong(0);
-        if ((apkSigBlockSizeInFooter < footer.capacity())
-                || (apkSigBlockSizeInFooter > Integer.MAX_VALUE - 8)) {
+        if (apkSigBlockSizeInFooter < footer.capacity()
+                || apkSigBlockSizeInFooter > Integer.MAX_VALUE - 8) {
             throw new SignatureNotFoundException(
                     "APK Signing Block size out of range: " + apkSigBlockSizeInFooter);
         }

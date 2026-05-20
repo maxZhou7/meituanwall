@@ -41,7 +41,7 @@ publishing {
         pluginMaven(MavenPublication) {
             artifactId = 'walle-plugin'
             groupId = 'com.github.maxZhou7'
-            version = '2.0.17'
+            version = '2.0.18'
             
             from components.java
             
