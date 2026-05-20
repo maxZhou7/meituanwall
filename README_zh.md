@@ -5,7 +5,7 @@
 > **原始项目**: https://github.com/Meituan-Dianping/walle  
 > **技术文章**: [美团Android新一代渠道包生成工具](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)
 
-[![Release Version](https://img.shields.io/badge/release-2.0.16-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
+[![Release Version](https://img.shields.io/badge/release-2.0.17-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
 [![JitPack](https://jitpack.io/v/maxZhou7/meituanwall.svg)](https://jitpack.io/#maxZhou7/meituanwall)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
@@ -61,7 +61,7 @@ allprojects {
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.16'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.17'
 }
 ```
 
@@ -98,7 +98,7 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.16'
+        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.17'
     }
 }
 ```
@@ -111,7 +111,7 @@ buildscript {
 apply plugin: 'walle'
 
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.16'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.17'
 }
 ```
 
@@ -230,10 +230,10 @@ java -jar walle-cli-all.jar batch -f channel.txt app-release.apk output/
 
 | 模块 | Maven 坐标 | 说明 |
 |------|-----------|------|
-| **library** | `com.github.maxZhou7.meituanwall:walle:2.0.16` | Android Library，提供渠道信息读取功能 |
-| **plugin** | `com.github.maxZhou7.meituanwall:walle-plugin:2.0.16` | Gradle 插件（已适配 AGP 8.x）|
-| **payload_reader** | `com.github.maxZhou7.meituanwall:payload_reader:2.0.16` | APK Signing Block 读取模块 |
-| **payload_writer** | `com.github.maxZhou7.meituanwall:payload_writer:2.0.16` | APK Signing Block 写入模块 |
+| **library** | `com.github.maxZhou7.meituanwall:walle:2.0.17` | Android Library，提供渠道信息读取功能 |
+| **plugin** | `com.github.maxZhou7.meituanwall:walle-plugin:2.0.17` | Gradle 插件（已适配 AGP 8.x）|
+| **payload_reader** | `com.github.maxZhou7.meituanwall:payload_reader:2.0.17` | APK Signing Block 读取模块 |
+| **payload_writer** | `com.github.maxZhou7.meituanwall:payload_writer:2.0.17` | APK Signing Block 写入模块 |
 | **walle-cli** | - | 命令行工具 |
 | app | - | 示例应用 |
 
@@ -245,7 +245,7 @@ java -jar walle-cli-all.jar batch -f channel.txt app-release.apk output/
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:payload_reader:2.0.16'
+    implementation 'com.github.maxZhou7.meituanwall:payload_reader:2.0.17'
 }
 ```
 
@@ -255,7 +255,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:payload_writer:2.0.16'
+    implementation 'com.github.maxZhou7.meituanwall:payload_writer:2.0.17'
 }
 ```
 
@@ -267,7 +267,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.16'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.17'
 }
 ```
 
@@ -299,7 +299,7 @@ Gradle 插件已适配 AGP 8.x，可以使用以下方式集成：
 ```gradle
 buildscript {
     dependencies {
-        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.16'
+        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.17'
     }
 }
 ```

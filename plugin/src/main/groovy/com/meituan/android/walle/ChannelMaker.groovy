@@ -26,9 +26,7 @@ class ChannelMaker extends DefaultTask {
 
     private static final String DOT_APK = ".apk";
 
-    @Input
     public def variant;
-    @Input
     public Project targetProject;
 
     @Input
@@ -175,7 +173,7 @@ class ChannelMaker extends DefaultTask {
 
                 boolean isFindConfigFile = false
                 locations.each { file ->
-                    if (isFindConfigFile){
+                    if (isFindConfigFile) {
                         return true
                     }
                     if (file.exists()) {
