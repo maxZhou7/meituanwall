@@ -28,6 +28,7 @@ dependencies {
 }
 
 // Configure publishing for Gradle Plugin
+// java-gradle-plugin automatically creates publications, we just need to configure them
 tasks.register('sourcesJar', Jar) {
     archiveClassifier.set('sources')
     from sourceSets.main.allSource
@@ -39,45 +40,20 @@ tasks.register('javadocJar', Jar) {
     from javadoc.destinationDir
 }
 
-// Ensure the plugin marker uses the correct version and dependencies
+// Configure the automatically created publications
 afterEvaluate {
-    publishing.publications.withType(MavenPublication).configureEach { publication ->
-        if (publication.name.contains('PluginMarker')) {
+    // Configure the main plugin implementation publication (pluginMaven)
+    if (publishing.publications.findByName('pluginMaven')) {
+        publishing.publications.named('pluginMaven') { MavenPublication publication ->
+            publication.groupId = 'com.github.maxZhou7.meituanwall'
+            publication.artifactId = 'plugin'
             publication.version = VERSION_NAME
             
-            // Fix the dependency coordinates in the marker POM to match JitPack format
-            publication.pom.withXml { xmlProvider ->
-                def root = xmlProvider.asNode()
-                if (root) {
-                    // Remove existing incorrect dependencies
-                    def depsNode = root.get('dependencies')
-                    if (depsNode) {
-                        root.remove(depsNode)
-                    }
-                    
-                    // Add correct dependency on the plugin implementation
-                    // For JitPack multi-module: groupId = com.github.user.repo, artifactId = module name
-                    def newDeps = root.appendNode('dependencies')
-                    def dep = newDeps.appendNode('dependency')
-                    dep.appendNode('groupId', 'com.github.maxZhou7.meituanwall')
-                    dep.appendNode('artifactId', 'plugin')
-                    dep.appendNode('version', VERSION_NAME)
-                }
-            }
-        }
-    }
-}
-
-publishing {
-    publications {
-        wallePlugin(MavenPublication) {
-            from components.java
+            // Add sources and javadoc artifacts
+            artifact(tasks.named('sourcesJar').get())
+            artifact(tasks.named('javadocJar').get())
             
-            // Let JitPack set the groupId automatically based on repository
-            // artifactId will be 'plugin' (module name)
-            // Version will be set by JitPack from git tag
-            
-            pom {
+            publication.pom {
                 name = 'Walle Gradle Plugin'
                 description = 'Gradle plugin for Android APK channel packaging'
                 url = 'https://github.com/maxZhou7/meituanwall'
@@ -104,10 +80,13 @@ publishing {
                 }
             }
         }
-        
-        // Plugin marker artifact will be automatically created by java-gradle-plugin
-        // The marker coordinates will be: com.github.maxZhou7.walle:com.github.maxZhou7.walle.gradle.plugin:VERSION
-        // It will automatically depend on the wallePlugin publication above
+    }
+    
+    // Configure the plugin marker publication
+    publishing.publications.withType(MavenPublication).configureEach { publication ->
+        if (publication.name.contains('PluginMarker')) {
+            publication.version = VERSION_NAME
+        }
     }
 }
 
@@ -115,7 +94,7 @@ publishing {
 gradlePlugin {
     plugins {
         wallePlugin {
-            id = 'com.github.maxZhou7.walle'
+            id = 'com.github.maxZhou7.meituanwall.walle'
             implementationClass = 'com.meituan.android.walle.GradlePlugin'
             displayName = 'Walle Gradle Plugin'
             description = 'Gradle plugin for Android APK channel packaging'
