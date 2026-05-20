@@ -40,8 +40,8 @@ class ChannelMaker extends DefaultTask {
     }
 
     public void setup() {
-        description "Make Multi-Channel"
-        group "Package"
+        description = "Make Multi-Channel"
+        group = "Package"
     }
 
     private static final String PROPERTY_CHANNEL_LIST = 'channelList'
