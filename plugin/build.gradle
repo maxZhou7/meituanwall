@@ -94,7 +94,7 @@ afterEvaluate {
 gradlePlugin {
     plugins {
         wallePlugin {
-            id = 'com.github.maxZhou7.meituanwall.walle'
+            id = 'com.github.maxZhou7.meituanwall'
             implementationClass = 'com.meituan.android.walle.GradlePlugin'
             displayName = 'Walle Gradle Plugin'
             description = 'Gradle plugin for Android APK channel packaging'
