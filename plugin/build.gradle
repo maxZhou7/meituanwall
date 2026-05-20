@@ -43,9 +43,9 @@ tasks.register('javadocJar', Jar) {
 afterEvaluate {
     publishing.publications.withType(MavenPublication).configureEach { publication ->
         if (publication.name.contains('PluginMarker')) {
-            publication.version = '2.0.24'
+            publication.version = VERSION_NAME
             
-            // Fix the dependency coordinates in the marker POM
+            // Fix the dependency coordinates in the marker POM to match JitPack format
             publication.pom.withXml { xmlProvider ->
                 def root = xmlProvider.asNode()
                 if (root) {
@@ -56,11 +56,12 @@ afterEvaluate {
                     }
                     
                     // Add correct dependency on the plugin implementation
+                    // For JitPack multi-module: groupId = com.github.user.repo, artifactId = module name
                     def newDeps = root.appendNode('dependencies')
                     def dep = newDeps.appendNode('dependency')
-                    dep.appendNode('groupId', 'com.github.maxZhou7')
-                    dep.appendNode('artifactId', 'walle-plugin')
-                    dep.appendNode('version', '2.0.24')
+                    dep.appendNode('groupId', 'com.github.maxZhou7.meituanwall')
+                    dep.appendNode('artifactId', 'plugin')
+                    dep.appendNode('version', VERSION_NAME)
                 }
             }
         }
@@ -72,10 +73,9 @@ publishing {
         wallePlugin(MavenPublication) {
             from components.java
             
-            // Explicitly set coordinates for the plugin implementation artifact
-            groupId = 'com.github.maxZhou7'
-            artifactId = 'walle-plugin'
-            version = '2.0.24'
+            // Let JitPack set the groupId automatically based on repository
+            // artifactId will be 'plugin' (module name)
+            // Version will be set by JitPack from git tag
             
             pom {
                 name = 'Walle Gradle Plugin'
@@ -106,7 +106,7 @@ publishing {
         }
         
         // Plugin marker artifact will be automatically created by java-gradle-plugin
-        // The marker coordinates will be: com.github.maxZhou7.walle:com.github.maxZhou7.walle.gradle.plugin:2.0.23
+        // The marker coordinates will be: com.github.maxZhou7.walle:com.github.maxZhou7.walle.gradle.plugin:VERSION
         // It will automatically depend on the wallePlugin publication above
     }
 }
