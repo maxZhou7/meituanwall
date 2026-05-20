@@ -46,7 +46,7 @@ publishing {
             
             artifactId = 'walle-plugin'
             groupId = 'com.github.maxZhou7'
-            version = '2.0.21'
+            version = '2.0.22'
             
             pom {
                 name = 'Walle Gradle Plugin'
@@ -80,7 +80,17 @@ publishing {
         wallePluginMarkerMaven(MavenPublication) {
             groupId = 'com.github.maxZhou7'
             artifactId = 'com.github.maxZhou7.walle.gradle.plugin'
-            version = '2.0.21'
+            version = '2.0.22'
+            
+            // The marker artifact's POM must declare a dependency on the actual plugin implementation
+            pom.withXml {
+                def root = asNode()
+                def dependencies = root.appendNode('dependencies')
+                def dependency = dependencies.appendNode('dependency')
+                dependency.appendNode('groupId', 'com.github.maxZhou7')
+                dependency.appendNode('artifactId', 'walle-plugin')
+                dependency.appendNode('version', '2.0.22')
+            }
             
             pom {
                 name = 'Walle Gradle Plugin Marker'
