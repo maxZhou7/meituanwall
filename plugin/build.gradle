@@ -41,15 +41,12 @@ tasks.register('javadocJar', Jar) {
 
 publishing {
     publications {
-        pluginMaven(MavenPublication) {
-            artifactId = 'walle-plugin'
-            groupId = 'com.github.maxZhou7'
-            version = '2.0.19'
-            
+        wallePlugin(MavenPublication) {
             from components.java
             
-            artifact sourcesJar
-            artifact javadocJar
+            artifactId = 'walle-plugin'
+            groupId = 'com.github.maxZhou7'
+            version = '2.0.20'
             
             pom {
                 name = 'Walle Gradle Plugin'

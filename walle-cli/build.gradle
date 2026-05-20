@@ -5,6 +5,11 @@ plugins {
 
 // apply from: rootProject.file('quality.gradle')
 
+java {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+}
+
 jar {
     manifest {
         attributes 'Main-Class': 'com.meituan.android.walle.Main'
@@ -21,6 +26,3 @@ dependencies {
     implementation libs.json.v20251224
     implementation libs.gson
 }
-
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion

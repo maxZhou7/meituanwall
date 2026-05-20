@@ -6,6 +6,8 @@ apply from: rootProject.file('quality.gradle')
 java {
     withSourcesJar()
     withJavadocJar()
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
 }
 
 dependencies {
@@ -14,9 +16,6 @@ dependencies {
     implementation project(':payload_reader')
 }
 
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion
-
 // 配置发布
 publishing {
     publications {
@@ -24,7 +23,7 @@ publishing {
             from components.java
             groupId = 'com.github.maxZhou7'
             artifactId = 'payload_writer'
-            version = '2.0.19'
+            version = '2.0.20'
         }
     }
 }

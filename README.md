@@ -5,7 +5,7 @@
 > **Original Project**: https://github.com/Meituan-Dianping/walle  
 > **Technical Article**: [Meituan's New Generation Android Channel Package Tool](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)
 
-[![Release Version](https://img.shields.io/badge/release-2.0.18-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
+[![Release Version](https://img.shields.io/badge/release-2.0.20-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
 [![JitPack](https://jitpack.io/v/maxZhou7/meituanwall.svg)](https://jitpack.io/#maxZhou7/meituanwall)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
@@ -61,7 +61,7 @@ Add to App module's `build.gradle`:
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.18'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.20'
 }
 ```
 
@@ -86,7 +86,39 @@ String buildTime = WalleChannelReader.get(context, "buildtime");
 
 ### Method 2: Gradle Plugin (Adapted for AGP 8.x)
 
-#### 1. Configure Project-level build.gradle
+#### Option A: Using Modern `plugins {}` Block (Recommended) ✨
+
+**For Gradle 6.0+ with settings.gradle:**
+
+```gradle
+// settings.gradle
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+plugins {
+    id 'com.github.maxZhou7.walle' version '2.0.20'
+}
+```
+
+**Or directly in build.gradle (Gradle 7.0+):**
+
+```gradle
+plugins {
+    id 'com.github.maxZhou7.walle' version '2.0.20'
+}
+
+dependencies {
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.20'
+}
+```
+
+#### Option B: Traditional classpath Method
 
 Add to `build.gradle` file in the project root directory:
 
@@ -98,20 +130,18 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.18'
+        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.20'
     }
 }
 ```
 
-#### 2. Configure App Module build.gradle
-
-Apply plugin and add dependencies in the App module's `build.gradle`:
+Then apply plugin in App module build.gradle:
 
 ```gradle
 apply plugin: 'walle'
 
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.18'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.20'
 }
 ```
 
@@ -278,10 +308,10 @@ This project contains the following modules:
 
 | Module | Maven Coordinates | Description |
 |------|-----------|------|
-| **library** | `com.github.maxZhou7.meituanwall:walle:2.0.17` | Android Library, provides channel information reading functionality |
-| **plugin** | `com.github.maxZhou7.meituanwall:walle-plugin:2.0.17` | Gradle plugin (adapted for AGP 8.x) |
-| **payload_reader** | `com.github.maxZhou7.meituanwall:payload_reader:2.0.17` | APK Signing Block reading module |
-| **payload_writer** | `com.github.maxZhou7.meituanwall:payload_writer:2.0.17` | APK Signing Block writing module |
+| **library** | `com.github.maxZhou7.meituanwall:walle:2.0.20` | Android Library, provides channel information reading functionality |
+| **plugin** | `com.github.maxZhou7.meituanwall:walle-plugin:2.0.20` | Gradle plugin (adapted for AGP 8.x, supports plugins {}) |
+| **payload_reader** | `com.github.maxZhou7.meituanwall:payload_reader:2.0.20` | APK Signing Block reading module |
+| **payload_writer** | `com.github.maxZhou7.meituanwall:payload_writer:2.0.20` | APK Signing Block writing module |
 | **walle-cli** | - | Command line tool |
 | app | - | Sample application |
 
@@ -293,7 +323,7 @@ If you only need to use specific functionality, you can reference the correspond
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:payload_reader:2.0.17'
+    implementation 'com.github.maxZhou7.meituanwall:payload_reader:2.0.20'
 }
 ```
 
@@ -303,7 +333,7 @@ Applicable scenarios: Only need to read channel information from APKs, no writin
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:payload_writer:2.0.17'
+    implementation 'com.github.maxZhou7.meituanwall:payload_writer:2.0.20'
 }
 ```
 
@@ -315,7 +345,7 @@ Applicable scenarios: Need to write channel information to APKs on the server si
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.18'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.20'
 }
 ```
 
@@ -344,12 +374,20 @@ Please refer to: [360 Jiagu Incompatibility Issue](https://github.com/Meituan-Di
 
 ### 4. Gradle Plugin Support
 
-The Gradle plugin has been adapted for AGP 8.x and can be integrated using the following method:
+The Gradle plugin has been adapted for AGP 8.x and supports both modern `plugins {}` block and traditional classpath methods:
 
+**Modern Method (Recommended):**
+```gradle
+plugins {
+    id 'com.github.maxZhou7.walle' version '2.0.20'
+}
+```
+
+**Traditional Method:**
 ```gradle
 buildscript {
     dependencies {
-        classpath 'com.github.maxZhou7.meituanwall:plugin:2.0.15'
+        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.20'
     }
 }
 ```
@@ -363,7 +401,7 @@ If you encounter a `401 Unauthorized` error when fetching dependencies from JitP
 **Solution 1: Manually Trigger JitPack Build**
 
 1. Visit [JitPack](https://jitpack.io/#maxZhou7/meituanwall)
-2. Enter version tag: `v2.0.15`
+2. Enter version tag: `v2.0.20`
 3. Click "Get it" button to trigger build
 4. Wait for build completion (usually takes a few minutes)
 5. Check build log for success status
@@ -385,7 +423,7 @@ rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.maxZhou7
 
 **Solution 4: Use Alternative Version**
 
-If v2.0.15 hasn't been built yet, try using a previously built version like `v2.0.12`.
+If v2.0.20 hasn't been built yet, try using a previously built version.
 
 ## 馃洜锔?Build Project
 

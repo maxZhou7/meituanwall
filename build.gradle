@@ -3,7 +3,7 @@ plugins {
     // Android plugins will be applied in individual modules
 }
 
-allprojects {
+subprojects {
     repositories {
         mavenLocal()
         google()
@@ -15,10 +15,8 @@ allprojects {
         options.encoding = 'UTF-8'
     }
 
-    tasks.withType(JavaCompile).tap {
-        configureEach {
-            options.encoding = "UTF-8"
-        }
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
     }
 }
 

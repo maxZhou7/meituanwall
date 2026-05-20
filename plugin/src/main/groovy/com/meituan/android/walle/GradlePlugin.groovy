@@ -89,7 +89,9 @@ class GradlePlugin implements Plugin<Project> {
             }
             // Fallback to old approach
             if (variant.buildType.hasProperty('signingConfig')) {
-                return variant.buildType.signingConfig ?: variant.mergedFlavor.signingConfig
+                def buildTypeSigningConfig = variant.buildType.signingConfig
+                def mergedFlavorSigningConfig = variant.mergedFlavor.signingConfig
+                return buildTypeSigningConfig != null ? buildTypeSigningConfig : mergedFlavorSigningConfig
             }
             return null
         } catch (Exception e) {
