@@ -46,7 +46,7 @@ publishing {
             
             artifactId = 'walle-plugin'
             groupId = 'com.github.maxZhou7'
-            version = '2.0.22'
+            version = '2.0.23'
             
             pom {
                 name = 'Walle Gradle Plugin'
@@ -78,9 +78,13 @@ publishing {
         
         // Plugin marker artifact - required for Gradle plugin resolution
         wallePluginMarkerMaven(MavenPublication) {
-            groupId = 'com.github.maxZhou7'
+            // For plugins DSL to work, the marker's coordinates must be:
+            // groupId:plugin-id.gradle.plugin:version
+            // Since our plugin id is 'com.github.maxZhou7.walle',
+            // Gradle looks for: com.github.maxZhou7.walle:com.github.maxZhou7.walle.gradle.plugin:2.0.23
+            groupId = 'com.github.maxZhou7.walle'
             artifactId = 'com.github.maxZhou7.walle.gradle.plugin'
-            version = '2.0.22'
+            version = '2.0.23'
             
             // The marker artifact's POM must declare a dependency on the actual plugin implementation
             pom.withXml {
@@ -89,7 +93,7 @@ publishing {
                 def dependency = dependencies.appendNode('dependency')
                 dependency.appendNode('groupId', 'com.github.maxZhou7')
                 dependency.appendNode('artifactId', 'walle-plugin')
-                dependency.appendNode('version', '2.0.22')
+                dependency.appendNode('version', '2.0.23')
             }
             
             pom {
