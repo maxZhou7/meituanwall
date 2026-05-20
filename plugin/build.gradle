@@ -1,5 +1,8 @@
-apply plugin: 'groovy'
-apply plugin: 'maven-publish'
+plugins {
+    id 'groovy'
+    id 'maven-publish'
+    id 'java-gradle-plugin'
+}
 // apply from: rootProject.file('quality.gradle')
 
 jar {
@@ -41,7 +44,7 @@ publishing {
         pluginMaven(MavenPublication) {
             artifactId = 'walle-plugin'
             groupId = 'com.github.maxZhou7'
-            version = '2.0.18'
+            version = '2.0.19'
             
             from components.java
             
@@ -74,6 +77,18 @@ publishing {
                     url = 'https://github.com/maxZhou7/meituanwall'
                 }
             }
+        }
+    }
+}
+
+// Configure Gradle Plugin Development
+gradlePlugin {
+    plugins {
+        wallePlugin {
+            id = 'com.github.maxZhou7.walle'
+            implementationClass = 'com.meituan.android.walle.GradlePlugin'
+            displayName = 'Walle Gradle Plugin'
+            description = 'Gradle plugin for Android APK channel packaging'
         }
     }
 }
