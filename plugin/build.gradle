@@ -39,14 +39,43 @@ tasks.register('javadocJar', Jar) {
     from javadoc.destinationDir
 }
 
+// Ensure the plugin marker uses the correct version and dependencies
+afterEvaluate {
+    publishing.publications.withType(MavenPublication).configureEach { publication ->
+        if (publication.name.contains('PluginMarker')) {
+            publication.version = '2.0.24'
+            
+            // Fix the dependency coordinates in the marker POM
+            publication.pom.withXml { xmlProvider ->
+                def root = xmlProvider.asNode()
+                if (root) {
+                    // Remove existing incorrect dependencies
+                    def depsNode = root.get('dependencies')
+                    if (depsNode) {
+                        root.remove(depsNode)
+                    }
+                    
+                    // Add correct dependency on the plugin implementation
+                    def newDeps = root.appendNode('dependencies')
+                    def dep = newDeps.appendNode('dependency')
+                    dep.appendNode('groupId', 'com.github.maxZhou7')
+                    dep.appendNode('artifactId', 'walle-plugin')
+                    dep.appendNode('version', '2.0.24')
+                }
+            }
+        }
+    }
+}
+
 publishing {
     publications {
         wallePlugin(MavenPublication) {
             from components.java
             
-            artifactId = 'walle-plugin'
+            // Explicitly set coordinates for the plugin implementation artifact
             groupId = 'com.github.maxZhou7'
-            version = '2.0.23'
+            artifactId = 'walle-plugin'
+            version = '2.0.24'
             
             pom {
                 name = 'Walle Gradle Plugin'
@@ -76,53 +105,9 @@ publishing {
             }
         }
         
-        // Plugin marker artifact - required for Gradle plugin resolution
-        wallePluginMarkerMaven(MavenPublication) {
-            // For plugins DSL to work, the marker's coordinates must be:
-            // groupId:plugin-id.gradle.plugin:version
-            // Since our plugin id is 'com.github.maxZhou7.walle',
-            // Gradle looks for: com.github.maxZhou7.walle:com.github.maxZhou7.walle.gradle.plugin:2.0.23
-            groupId = 'com.github.maxZhou7.walle'
-            artifactId = 'com.github.maxZhou7.walle.gradle.plugin'
-            version = '2.0.23'
-            
-            // The marker artifact's POM must declare a dependency on the actual plugin implementation
-            pom.withXml {
-                def root = asNode()
-                def dependencies = root.appendNode('dependencies')
-                def dependency = dependencies.appendNode('dependency')
-                dependency.appendNode('groupId', 'com.github.maxZhou7')
-                dependency.appendNode('artifactId', 'walle-plugin')
-                dependency.appendNode('version', '2.0.23')
-            }
-            
-            pom {
-                name = 'Walle Gradle Plugin Marker'
-                description = 'Marker artifact for Walle Gradle Plugin'
-                url = 'https://github.com/maxZhou7/meituanwall'
-                
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                
-                developers {
-                    developer {
-                        id = 'maxzhou'
-                        name = 'maxzhou'
-                        email = 'maxzhou7@gamil.com'
-                    }
-                }
-                
-                scm {
-                    connection = 'scm:git:git://github.com/maxZhou7/meituanwall.git'
-                    developerConnection = 'scm:git:ssh://github.com/maxZhou7/meituanwall.git'
-                    url = 'https://github.com/maxZhou7/meituanwall'
-                }
-            }
-        }
+        // Plugin marker artifact will be automatically created by java-gradle-plugin
+        // The marker coordinates will be: com.github.maxZhou7.walle:com.github.maxZhou7.walle.gradle.plugin:2.0.23
+        // It will automatically depend on the wallePlugin publication above
     }
 }
 

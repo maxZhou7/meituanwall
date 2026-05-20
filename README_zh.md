@@ -5,7 +5,7 @@
 > **原始项目**: https://github.com/Meituan-Dianping/walle  
 > **技术文章**: [美团Android新一代渠道包生成工具](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)
 
-[![Release Version](https://img.shields.io/badge/release-2.0.20-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
+[![Release Version](https://img.shields.io/badge/release-2.0.24-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
 [![JitPack](https://jitpack.io/v/maxZhou7/meituanwall.svg)](https://jitpack.io/#maxZhou7/meituanwall)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
@@ -61,7 +61,7 @@ allprojects {
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.20'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.24'
 }
 ```
 
@@ -88,7 +88,19 @@ String buildTime = WalleChannelReader.get(context, "buildtime");
 
 #### 方式 A：使用现代化的 `plugins {}` 块（推荐）✨
 
-**适用于 Gradle 6.0+ 配合 settings.gradle：**
+**在 App 模块的 `build.gradle` 中使用：**
+
+```gradle
+plugins {
+    id 'com.github.maxZhou7.walle' version '2.0.24'
+}
+
+dependencies {
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.24'
+}
+```
+
+**注意：** 确保在 `settings.gradle` 中添加 JitPack 仓库：
 
 ```gradle
 // settings.gradle
@@ -99,22 +111,6 @@ pluginManagement {
         gradlePluginPortal()
         maven { url 'https://jitpack.io' }
     }
-}
-
-plugins {
-    id 'com.github.maxZhou7.walle' version '2.0.20'
-}
-```
-
-**或者直接在 build.gradle 中使用（Gradle 7.0+）：**
-
-```gradle
-plugins {
-    id 'com.github.maxZhou7.walle' version '2.0.20'
-}
-
-dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.20'
 }
 ```
 
@@ -130,7 +126,7 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.20'
+        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.24'
     }
 }
 ```
@@ -138,10 +134,10 @@ buildscript {
 然后在 App 模块 build.gradle 中应用插件：
 
 ```gradle
-apply plugin: 'walle'
+apply plugin: 'com.github.maxZhou7.walle'
 
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.20'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.24'
 }
 ```
 
@@ -260,10 +256,10 @@ java -jar walle-cli-all.jar batch -f channel.txt app-release.apk output/
 
 | 模块 | Maven 坐标 | 说明 |
 |------|-----------|------|
-| **library** | `com.github.maxZhou7.meituanwall:walle:2.0.20` | Android Library，提供渠道信息读取功能 |
-| **plugin** | `com.github.maxZhou7.meituanwall:walle-plugin:2.0.20` | Gradle 插件（已适配 AGP 8.x，支持 plugins {}) |
-| **payload_reader** | `com.github.maxZhou7.meituanwall:payload_reader:2.0.20` | APK Signing Block 读取模块 |
-| **payload_writer** | `com.github.maxZhou7.meituanwall:payload_writer:2.0.20` | APK Signing Block 写入模块 |
+| **library** | `com.github.maxZhou7.meituanwall:walle:2.0.24` | Android Library，提供渠道信息读取功能 |
+| **plugin** | `com.github.maxZhou7.meituanwall:walle-plugin:2.0.24` | Gradle 插件（已适配 AGP 8.x，支持 plugins {}) |
+| **payload_reader** | `com.github.maxZhou7.meituanwall:payload_reader:2.0.24` | APK Signing Block 读取模块 |
+| **payload_writer** | `com.github.maxZhou7.meituanwall:payload_writer:2.0.24` | APK Signing Block 写入模块 |
 | **walle-cli** | - | 命令行工具 |
 | app | - | 示例应用 |
 
@@ -275,7 +271,7 @@ java -jar walle-cli-all.jar batch -f channel.txt app-release.apk output/
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:payload_reader:2.0.20'
+    implementation 'com.github.maxZhou7.meituanwall:payload_reader:2.0.24'
 }
 ```
 
@@ -285,7 +281,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:payload_writer:2.0.20'
+    implementation 'com.github.maxZhou7.meituanwall:payload_writer:2.0.24'
 }
 ```
 
@@ -297,7 +293,7 @@ dependencies {
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.20'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.24'
 }
 ```
 
@@ -322,16 +318,31 @@ dependencies {
 
 请参考：[360加固失效问题](https://github.com/Meituan-Dianping/walle/wiki/360%E5%8A%A0%E5%9B%BA%E5%A4%B1%E6%95%88%EF%BC%9F)
 
-### 4. Gradle 插件支持
+### 4. Plugins DSL 支持 ✨
 
-Gradle 插件已适配 AGP 8.x，可以使用以下方式集成：
+Gradle 插件完全支持现代化的 `plugins {}` DSL 块（自 v2.0.24 起）：
 
+**现代方式（推荐）：**
+```gradle
+plugins {
+    id 'com.github.maxZhou7.walle' version '2.0.24'
+}
+```
+
+**传统方式：**
 ```gradle
 buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
     dependencies {
-        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.18'
+        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.24'
     }
 }
+
+apply plugin: 'com.github.maxZhou7.walle'
 ```
 
 详细使用说明请参考上面的"方式二：Gradle 插件"。
@@ -343,7 +354,7 @@ buildscript {
 **解决方法 1：手动触发 JitPack 构建**
 
 1. 访问 [JitPack](https://jitpack.io/#maxZhou7/meituanwall)
-2. 输入版本号：`v2.0.15`
+2. 输入版本号：`v2.0.24`
 3. 点击 "Get it" 按钮触发构建
 4. 等待构建完成（通常需要几分钟）
 5. 查看构建日志确认成功状态
@@ -365,7 +376,7 @@ rm -rf ~/.gradle/caches/modules-2/files-2.1/com.github.maxZhou7
 
 **解决方法 4：使用其他版本**
 
-如果 v2.0.15 尚未构建，可以尝试使用之前已构建的版本，如 `v2.0.12`。
+如果 v2.0.24 尚未构建，可以尝试使用之前已构建的版本。
 
 ## 🔧 构建项目
 
@@ -426,7 +437,7 @@ cd walle
 - **Gradle 版本**: 8.13+
 - **AGP 版本**: 8.8.0+
 
-> ⚠️ **注意**: 由于 AGP 8.x 的 API 变化，Gradle 插件功能暂时禁用，推荐使用 CLI 工具或 Library 依赖方式使用。
+> ✅ **注意**: Gradle 插件现已完全支持 AGP 8.x，并配置了正确的 plugin marker artifacts 以支持 plugins DSL（自 v2.0.24 起）。
 
 ## 🤝 贡献指南
 
