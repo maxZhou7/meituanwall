@@ -46,11 +46,45 @@ publishing {
             
             artifactId = 'walle-plugin'
             groupId = 'com.github.maxZhou7'
-            version = '2.0.20'
+            version = '2.0.21'
             
             pom {
                 name = 'Walle Gradle Plugin'
                 description = 'Gradle plugin for Android APK channel packaging'
+                url = 'https://github.com/maxZhou7/meituanwall'
+                
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                
+                developers {
+                    developer {
+                        id = 'maxzhou'
+                        name = 'maxzhou'
+                        email = 'maxzhou7@gamil.com'
+                    }
+                }
+                
+                scm {
+                    connection = 'scm:git:git://github.com/maxZhou7/meituanwall.git'
+                    developerConnection = 'scm:git:ssh://github.com/maxZhou7/meituanwall.git'
+                    url = 'https://github.com/maxZhou7/meituanwall'
+                }
+            }
+        }
+        
+        // Plugin marker artifact - required for Gradle plugin resolution
+        wallePluginMarkerMaven(MavenPublication) {
+            groupId = 'com.github.maxZhou7'
+            artifactId = 'com.github.maxZhou7.walle.gradle.plugin'
+            version = '2.0.21'
+            
+            pom {
+                name = 'Walle Gradle Plugin Marker'
+                description = 'Marker artifact for Walle Gradle Plugin'
                 url = 'https://github.com/maxZhou7/meituanwall'
                 
                 licenses {
