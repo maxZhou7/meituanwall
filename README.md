@@ -5,7 +5,7 @@
 > **Original Project**: https://github.com/Meituan-Dianping/walle  
 > **Technical Article**: [Meituan's New Generation Android Channel Package Tool](http://tech.meituan.com/2017/01/13/android-apk-v2-signature-scheme.html)
 
-[![Release Version](https://img.shields.io/badge/release-2.0.24-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
+[![Release Version](https://img.shields.io/badge/release-2.1.0-blue.svg)](https://github.com/maxZhou7/meituanwall/releases)
 [![JitPack](https://jitpack.io/v/maxZhou7/meituanwall.svg)](https://jitpack.io/#maxZhou7/meituanwall)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/walle/master/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com/)
@@ -61,7 +61,7 @@ Add to App module's `build.gradle`:
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.24'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.1.0'
 }
 ```
 
@@ -92,11 +92,11 @@ String buildTime = WalleChannelReader.get(context, "buildtime");
 
 ```gradle
 plugins {
-    id 'com.github.maxZhou7.walle' version '2.0.24'
+    id 'com.github.maxZhou7.meituanwall' version '2.1.0'
 }
 
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.24'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.1.0'
 }
 ```
 
@@ -126,7 +126,7 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.24'
+        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.1.0'
     }
 }
 ```
@@ -134,10 +134,10 @@ buildscript {
 Then apply plugin in App module build.gradle:
 
 ```gradle
-apply plugin: 'com.github.maxZhou7.walle'
+apply plugin: 'com.github.maxZhou7.meituanwall'
 
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.24'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.1.0'
 }
 ```
 
@@ -304,10 +304,10 @@ This project contains the following modules:
 
 | Module | Maven Coordinates | Description |
 |------|-----------|------|
-| **library** | `com.github.maxZhou7.meituanwall:walle:2.0.24` | Android Library, provides channel information reading functionality |
-| **plugin** | `com.github.maxZhou7.meituanwall:walle-plugin:2.0.24` | Gradle plugin (adapted for AGP 8.x, supports plugins {}) |
-| **payload_reader** | `com.github.maxZhou7.meituanwall:payload_reader:2.0.24` | APK Signing Block reading module |
-| **payload_writer** | `com.github.maxZhou7.meituanwall:payload_writer:2.0.24` | APK Signing Block writing module |
+| **library** | `com.github.maxZhou7.meituanwall:walle:2.1.0` | Android Library, provides channel information reading functionality |
+| **plugin** | `com.github.maxZhou7.meituanwall:walle-plugin:2.1.0` | Gradle plugin (adapted for AGP 8.x, supports plugins {}) |
+| **payload_reader** | `com.github.maxZhou7.meituanwall:payload_reader:2.1.0` | APK Signing Block reading module |
+| **payload_writer** | `com.github.maxZhou7.meituanwall:payload_writer:2.1.0` | APK Signing Block writing module |
 | **walle-cli** | - | Command line tool |
 | app | - | Sample application |
 
@@ -319,7 +319,7 @@ If you only need to use specific functionality, you can reference the correspond
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:payload_reader:2.0.24'
+    implementation 'com.github.maxZhou7.meituanwall:payload_reader:2.1.0'
 }
 ```
 
@@ -329,7 +329,7 @@ Applicable scenarios: Only need to read channel information from APKs, no writin
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:payload_writer:2.0.24'
+    implementation 'com.github.maxZhou7.meituanwall:payload_writer:2.1.0'
 }
 ```
 
@@ -341,7 +341,7 @@ Applicable scenarios: Need to write channel information to APKs on the server si
 
 ```gradle
 dependencies {
-    implementation 'com.github.maxZhou7.meituanwall:walle:2.0.24'
+    implementation 'com.github.maxZhou7.meituanwall:walle:2.1.0'
 }
 ```
 
@@ -370,14 +370,16 @@ Please refer to: [360 Jiagu Incompatibility Issue](https://github.com/Meituan-Di
 
 ### 5. Plugins DSL Support ✨
 
-The Gradle plugin fully supports the modern `plugins {}` DSL block (since v2.0.24):
+The Gradle plugin fully supports the modern `plugins {}` DSL block (since v2.1.0):
 
 **Modern Method (Recommended):**
 ```gradle
 plugins {
-    id 'com.github.maxZhou7.walle' version '2.0.24'
+    id 'com.github.maxZhou7.meituanwall' version '2.1.0'
 }
 ```
+
+**Important:** The plugin ID is `com.github.maxZhou7.meituanwall` (not `com.github.maxZhou7.walle`). This matches JitPack's groupId format for multi-module projects.
 
 **Traditional Method:**
 ```gradle
@@ -388,11 +390,11 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.0.24'
+        classpath 'com.github.maxZhou7.meituanwall:walle-plugin:2.1.0'
     }
 }
 
-apply plugin: 'com.github.maxZhou7.walle'
+apply plugin: 'com.github.maxZhou7.meituanwall'
 ```
 
 For detailed usage instructions, please refer to "Method 2: Gradle Plugin" above.
@@ -404,7 +406,7 @@ If you encounter a `401 Unauthorized` error when fetching dependencies from JitP
 **Solution 1: Manually Trigger JitPack Build**
 
 1. Visit [JitPack](https://jitpack.io/#maxZhou7/meituanwall)
-2. Enter version tag: `v2.0.24`
+2. Enter version tag: `v2.1.0`
 3. Click "Get it" button to trigger build
 4. Wait for build completion (usually takes a few minutes)
 5. Check build log for success status
@@ -488,7 +490,7 @@ This project has undergone comprehensive modernization upgrades based on the ori
 - **Gradle Version**: 8.13+
 - **AGP Version**: 8.8.0+
 
-> ✅ **Note**: The Gradle plugin now fully supports AGP 8.x with proper plugin marker artifacts for plugins DSL compatibility (since v2.0.24).
+> ✅ **Note**: The Gradle plugin now fully supports AGP 8.x with proper plugin marker artifacts for plugins DSL compatibility (since v2.1.0). The plugin ID is `com.github.maxZhou7.meituanwall` to match JitPack's groupId format.
 
 
 ## 🤝 Contribution Guidelines
