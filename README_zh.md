@@ -1,5 +1,10 @@
 # Walle (瓦力) - Android 渠道包打包工具
 
+<p align="center">
+  <a href="README.md">English</a> | 
+  <a href="README_zh.md">中文</a>
+</p>
+
 > **项目来源**: 本项目 fork 自 [美团点评 Walle](https://github.com/Meituan-Dianping/walle)，在此基础上进行了现代化升级和维护。
 > 
 > **原始项目**: https://github.com/Meituan-Dianping/walle  

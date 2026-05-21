@@ -1,5 +1,10 @@
 # Walle - Android Channel Package Builder
 
+<p align="center">
+  <a href="README.md">English</a> | 
+  <a href="README_zh.md">中文</a>
+</p>
+
 > **Project Origin**: This project is forked from [Meituan-Dianping Walle](https://github.com/Meituan-Dianping/walle), with modern upgrades and maintenance based on it.
 > 
 > **Original Project**: https://github.com/Meituan-Dianping/walle  
