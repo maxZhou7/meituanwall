@@ -63,6 +63,46 @@ class GradlePlugin implements Plugin<Project> {
                         project.logger.warn("Warning: APK Signature Scheme v2 may not be enabled for ${variant.name}.")
                     }
 
+                    // Register clean channel folder task
+                    def cleanChannelTask = project.tasks.register("clean${variantName}ChannelFolder") {
+                        description = "Clean channel output folder before packaging"
+                        group = "Package"
+                        
+                        doLast {
+                            def extension = Extension.getConfig(project)
+                            def channelOutputFolder = extension.apkOutputFolder
+                            
+                            // If custom output folder is configured, clean it
+                            if (channelOutputFolder instanceof File && channelOutputFolder.exists()) {
+                                project.logger.lifecycle("[Walle] Cleaning channel output folder: ${channelOutputFolder.absolutePath}")
+                                def deletedCount = 0
+                                channelOutputFolder.listFiles().each { file ->
+                                    if (file.name.endsWith('.apk')) {
+                                        file.delete()
+                                        deletedCount++
+                                        project.logger.info("[Walle] Deleted: ${file.name}")
+                                    }
+                                }
+                                project.logger.lifecycle("[Walle] Deleted ${deletedCount} APK file(s)")
+                            } else {
+                                // Otherwise clean the default output location
+                                def defaultOutputFolder = new File(project.buildDir, "outputs/apk/${variant.name}")
+                                if (defaultOutputFolder.exists()) {
+                                    project.logger.lifecycle("[Walle] Cleaning default output folder: ${defaultOutputFolder.absolutePath}")
+                                    def deletedCount = 0
+                                    defaultOutputFolder.listFiles().each { file ->
+                                        if (file.name.endsWith('.apk')) {
+                                            file.delete()
+                                            deletedCount++
+                                            project.logger.info("[Walle] Deleted: ${file.name}")
+                                        }
+                                    }
+                                    project.logger.lifecycle("[Walle] Deleted ${deletedCount} APK file(s)")
+                                }
+                            }
+                        }
+                    }
+
                     // Use register() instead of create() for lazy task configuration
                     def channelMakerTask = project.tasks.register("assemble${variantName}Channels", ChannelMaker) { task ->
                         task.targetProject = project
@@ -72,8 +112,11 @@ class GradlePlugin implements Plugin<Project> {
                         // AGP 8.x compatibility
                         try {
                             task.dependsOn variant.assembleProvider.get()
+                            // Make channel maker depend on clean task
+                            task.dependsOn cleanChannelTask
                         } catch (Exception e) {
                             task.dependsOn variant.assemble
+                            task.dependsOn cleanChannelTask
                         }
                     }
                 }
