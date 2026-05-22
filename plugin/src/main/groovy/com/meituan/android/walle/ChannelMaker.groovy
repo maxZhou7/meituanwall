@@ -28,6 +28,8 @@ class ChannelMaker extends DefaultTask {
 
     public def variant;
     public Project targetProject;
+    @Input
+    String variantName;
 
     @Input
     def getVariant() {
@@ -37,6 +39,11 @@ class ChannelMaker extends DefaultTask {
     @Input
     Project getTargetProject() {
         return targetProject
+    }
+
+    @Input
+    String getVariantName() {
+        return variantName
     }
 
     public void setup() {
@@ -55,7 +62,18 @@ class ChannelMaker extends DefaultTask {
 
         long startTime = System.currentTimeMillis();
 
-        def iterator = variant.outputs.iterator();
+        // AGP 9.0 compatibility: use variantName if variant is null
+        def actualVariant = variant
+        if (actualVariant == null && variantName != null) {
+            // Create a mock variant object for AGP 9.0
+            actualVariant = createVariantAdapter(targetProject, variantName)
+        }
+
+        if (actualVariant == null) {
+            throw new GradleException("Variant information is not available")
+        }
+
+        def iterator = actualVariant.outputs.iterator();
         while (iterator.hasNext()) {
             def it = iterator.next();
             def apkFile = it.outputFile
@@ -93,11 +111,11 @@ class ChannelMaker extends DefaultTask {
             def nameVariantMap = [
                     'appName'    : targetProject.name,
                     'projectName': targetProject.rootProject.name,
-                    'buildType'  : variant.buildType.name,
-                    'versionName': variant.versionName,
-                    'versionCode': variant.versionCode,
-                    'packageName': variant.applicationId,
-                    'flavorName' : variant.flavorName
+                    'buildType'  : actualVariant.buildType.name,
+                    'versionName': actualVariant.versionName,
+                    'versionCode': actualVariant.versionCode,
+                    'packageName': actualVariant.applicationId,
+                    'flavorName' : actualVariant.flavorName
             ]
 
             if (targetProject.hasProperty(PROPERTY_CHANNEL_LIST)) {
@@ -315,6 +333,62 @@ class ChannelMaker extends DefaultTask {
             hashCode = hashFunction.hashBytes(hashBytes)
         }
         return hashCode.toString();
+    }
+
+    /**
+     * Create a variant adapter for AGP 9.0
+     * This creates a mock variant object that mimics the old BaseVariant API
+     */
+    def createVariantAdapter(Project project, String variantName) {
+        // Get android extension
+        def androidExt = project.extensions.findByName('android')
+        if (androidExt == null) {
+            throw new GradleException("Android extension not found")
+        }
+
+        // Try to get variant from applicationVariants or libraryVariants
+        def variants = null
+        try {
+            if (androidExt.hasProperty('applicationVariants')) {
+                variants = androidExt.applicationVariants
+            } else if (androidExt.hasProperty('libraryVariants')) {
+                variants = androidExt.libraryVariants
+            }
+        } catch (Exception e) {
+            project.logger.warn("Could not access variants: ${e.message}")
+        }
+
+        if (variants != null) {
+            def foundVariant = variants.find { it.name == variantName }
+            if (foundVariant != null) {
+                return foundVariant
+            }
+        }
+
+        // Fallback: create minimal mock variant using project properties
+        def buildTypeName = variantName.contains('Release') ? 'release' : 'debug'
+        def flavorName = variantName.replace(buildTypeName.capitalize(), '').toLowerCase()
+        
+        return [
+            name: variantName,
+            buildType: [
+                name: buildTypeName
+            ],
+            versionName: project.android.defaultConfig.versionName ?: '1.0',
+            versionCode: project.android.defaultConfig.versionCode ?: 1,
+            applicationId: project.android.defaultConfig.applicationId ?: project.group,
+            flavorName: flavorName ?: 'default',
+            outputs: [
+                [
+                    outputFile: new File(project.layout.buildDirectory.get().asFile, "outputs/apk/${variantName}/${project.name}-${buildTypeName}.apk"),
+                    outputs: [
+                        [
+                            filters: []
+                        ]
+                    ]
+                ]
+            ]
+        ]
     }
 
 }

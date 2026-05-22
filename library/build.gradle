@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    // AGP 9.0 has built-in Kotlin support, no need to apply kotlin-android plugin
     id 'maven-publish'
 }
 

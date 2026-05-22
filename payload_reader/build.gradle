@@ -1,8 +1,15 @@
-apply plugin: 'java-library'
-apply plugin: 'maven-publish'
+plugins {
+    id 'java-library'
+    alias(libs.plugins.kotlin.jvm)
+    id 'maven-publish'
+}
 apply from: rootProject.file('quality.gradle')
 
 // 配置 sources jar 和 javadoc jar
+kotlin {
+    jvmToolchain(17)
+}
+
 java {
     withSourcesJar()
     withJavadocJar()

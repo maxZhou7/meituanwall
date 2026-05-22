@@ -1,6 +1,5 @@
 package com.meituan.android.walle
 
-import com.android.build.gradle.AppExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -53,15 +52,12 @@ class GradlePlugin implements Plugin<Project> {
 
     void applyTask(Project project) {
         project.afterEvaluate {
-            // AGP 8.x uses applicationVariants
-            def androidExt = project.extensions.findByType(AppExtension)
-            if (androidExt != null) {
-                androidExt.applicationVariants.configureEach { variant ->
-                    def variantName = variant.name.capitalize();
-
-                    if (!isV2SignatureSchemeEnabled(variant)) {
-                        project.logger.warn("Warning: APK Signature Scheme v2 may not be enabled for ${variant.name}.")
-                    }
+            // AGP 9.0 uses androidComponents API
+            def androidComponents = project.extensions.findByName('androidComponents')
+            if (androidComponents != null) {
+                // AGP 9.0+ approach using new Variant API
+                androidComponents.onVariants { variant ->
+                    def variantName = variant.name.capitalize()
 
                     // Register clean channel folder task
                     def cleanChannelTask = project.tasks.register("clean${variantName}ChannelFolder") {
@@ -86,7 +82,7 @@ class GradlePlugin implements Plugin<Project> {
                                 project.logger.lifecycle("[Walle] Deleted ${deletedCount} APK file(s)")
                             } else {
                                 // Otherwise clean the default output location
-                                def defaultOutputFolder = new File(project.buildDir, "outputs/apk/${variant.name}")
+                                def defaultOutputFolder = new File(project.layout.buildDirectory.get().asFile, "outputs/apk/${variant.name}")
                                 if (defaultOutputFolder.exists()) {
                                     project.logger.lifecycle("[Walle] Cleaning default output folder: ${defaultOutputFolder.absolutePath}")
                                     def deletedCount = 0
@@ -106,19 +102,89 @@ class GradlePlugin implements Plugin<Project> {
                     // Use register() instead of create() for lazy task configuration
                     def channelMakerTask = project.tasks.register("assemble${variantName}Channels", ChannelMaker) { task ->
                         task.targetProject = project
-                        task.variant = variant
+                        // Pass variant name and use adapter for AGP 9.0
+                        task.variantName = variant.name
                         task.setup()
 
-                        // AGP 8.x compatibility
-                        try {
-                            task.dependsOn variant.assembleProvider.get()
-                            // Make channel maker depend on clean task
-                            task.dependsOn cleanChannelTask
-                        } catch (Exception e) {
-                            task.dependsOn variant.assemble
-                            task.dependsOn cleanChannelTask
+                        // AGP 9.0 compatibility - depend on assemble task
+                        task.dependsOn "assemble${variantName}"
+                        // Make channel maker depend on clean task
+                        task.dependsOn cleanChannelTask
+                    }
+                }
+            } else {
+                // Fallback for older AGP versions (8.x and below)
+                try {
+                    def AppExtension = Class.forName("com.android.build.gradle.AppExtension")
+                    def androidExt = project.extensions.findByType(AppExtension)
+                    if (androidExt != null) {
+                        androidExt.applicationVariants.configureEach { variant ->
+                        def variantName = variant.name.capitalize();
+
+                        if (!isV2SignatureSchemeEnabled(variant)) {
+                            project.logger.warn("Warning: APK Signature Scheme v2 may not be enabled for ${variant.name}.")
+                        }
+
+                        // Register clean channel folder task
+                        def cleanChannelTask = project.tasks.register("clean${variantName}ChannelFolder") {
+                            description = "Clean channel output folder before packaging"
+                            group = "Package"
+                            
+                            doLast {
+                                def extension = Extension.getConfig(project)
+                                def channelOutputFolder = extension.apkOutputFolder
+                                
+                                // If custom output folder is configured, clean it
+                                if (channelOutputFolder instanceof File && channelOutputFolder.exists()) {
+                                    project.logger.lifecycle("[Walle] Cleaning channel output folder: ${channelOutputFolder.absolutePath}")
+                                    def deletedCount = 0
+                                    channelOutputFolder.listFiles().each { file ->
+                                        if (file.name.endsWith('.apk')) {
+                                            file.delete()
+                                            deletedCount++
+                                            project.logger.info("[Walle] Deleted: ${file.name}")
+                                        }
+                                    }
+                                    project.logger.lifecycle("[Walle] Deleted ${deletedCount} APK file(s)")
+                                } else {
+                                    // Otherwise clean the default output location
+                                    def defaultOutputFolder = new File(project.buildDir, "outputs/apk/${variant.name}")
+                                    if (defaultOutputFolder.exists()) {
+                                        project.logger.lifecycle("[Walle] Cleaning default output folder: ${defaultOutputFolder.absolutePath}")
+                                        def deletedCount = 0
+                                        defaultOutputFolder.listFiles().each { file ->
+                                            if (file.name.endsWith('.apk')) {
+                                                file.delete()
+                                                deletedCount++
+                                                project.logger.info("[Walle] Deleted: ${file.name}")
+                                            }
+                                        }
+                                        project.logger.lifecycle("[Walle] Deleted ${deletedCount} APK file(s)")
+                                    }
+                                }
+                            }
+                        }
+
+                        // Use register() instead of create() for lazy task configuration
+                        def channelMakerTask = project.tasks.register("assemble${variantName}Channels", ChannelMaker) { task ->
+                            task.targetProject = project
+                            task.variant = variant
+                            task.setup()
+
+                            // AGP 8.x compatibility
+                            try {
+                                task.dependsOn variant.assembleProvider.get()
+                                // Make channel maker depend on clean task
+                                task.dependsOn cleanChannelTask
+                            } catch (Exception e) {
+                                task.dependsOn variant.assemble
+                                task.dependsOn cleanChannelTask
+                            }
                         }
                     }
+                }
+                } catch (ClassNotFoundException e) {
+                    project.logger.warn("AppExtension not available (AGP 9.0+): ${e.message}")
                 }
             }
         }
