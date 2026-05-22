@@ -448,7 +448,7 @@ cd walle
 ./gradlew clean build
 
 # Build CLI tool
-./gradlew :walle-cli:shadowJar
+./gradlew :walle-cli:jar
 
 # Publish to local Maven
 ./gradlew :payload_reader:publishToMavenLocal :library:publishToMavenLocal :plugin:publishToMavenLocal

@@ -33,7 +33,6 @@ gson = "2.10.1"
 
 # CLI Tools
 jcommander = "1.82"
-shadow = "8.1.1"
 
 # Testing
 junit = "4.13.2"
@@ -73,4 +72,3 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

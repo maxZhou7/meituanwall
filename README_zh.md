@@ -398,7 +398,7 @@ cd walle
 ./gradlew clean build
 
 # 构建 CLI 工具
-./gradlew :walle-cli:shadowJar
+./gradlew :walle-cli:jar
 
 # 发布到本地 Maven
 ./gradlew :payload_reader:publishToMavenLocal :library:publishToMavenLocal :plugin:publishToMavenLocal

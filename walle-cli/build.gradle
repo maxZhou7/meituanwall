@@ -1,7 +1,6 @@
 plugins {
     id 'java-library'
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.shadow)
 }
 
 // apply from: rootProject.file('quality.gradle')
