@@ -25,6 +25,7 @@ jar {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn(':payload_writer:jar', ':payload_reader:jar')
 }
 
 dependencies {

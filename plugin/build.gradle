@@ -1,5 +1,4 @@
 plugins {
-    id 'groovy'
     alias(libs.plugins.kotlin.jvm)
     id 'maven-publish'
     id 'java-gradle-plugin'
@@ -14,7 +13,6 @@ jar {
 
 dependencies {
     implementation gradleApi()
-    implementation localGroovy()
     implementation libs.kotlin.stdlib
     implementation fileTree(dir: "./src/main/libs", include: ['*.jar'])
     implementation libs.commons.io
