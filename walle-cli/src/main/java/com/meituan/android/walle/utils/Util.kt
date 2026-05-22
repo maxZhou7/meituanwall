@@ -1,21 +1,19 @@
-package com.meituan.android.walle.utils;
+package com.meituan.android.walle.utils
 
-import java.io.File;
+import java.io.File
 
-
-public final class Util {
-    private Util() {
-        super();
+object Util {
+    @JvmStatic
+    fun isTextEmpty(text: String?): Boolean {
+        return text == null || text.isEmpty()
     }
 
-    public static boolean isTextEmpty(final String text) {
-        return text == null || text.length() == 0;
-    }
-    public static File removeDirInvalidChar(final File file) {
-        if (System.getProperties().getProperty("os.name").toUpperCase().startsWith("WINDOWS")) {
-            final String newFileName = file.getName().replaceAll("\"", "");
-            return new File(file.getParent(), newFileName);
+    @JvmStatic
+    fun removeDirInvalidChar(file: File): File {
+        if (System.getProperties().getProperty("os.name").uppercase().startsWith("WINDOWS")) {
+            val newFileName = file.name.replace("\"".toRegex(), "")
+            return File(file.parent, newFileName)
         }
-        return file;
+        return file
     }
 }

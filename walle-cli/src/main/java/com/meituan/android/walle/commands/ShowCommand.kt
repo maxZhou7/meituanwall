@@ -1,82 +1,67 @@
-package com.meituan.android.walle.commands;
+package com.meituan.android.walle.commands
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.beust.jcommander.converters.FileConverter;
-import com.meituan.android.walle.ChannelInfo;
-import com.meituan.android.walle.ChannelReader;
-import com.meituan.android.walle.utils.Fun1;
-
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
+import com.beust.jcommander.Parameter
+import com.beust.jcommander.Parameters
+import com.beust.jcommander.converters.FileConverter
+import com.meituan.android.walle.ChannelReader
+import com.meituan.android.walle.utils.Fun1
+import java.io.File
 
 @Parameters(commandDescription = "get channel info from apk and show all by default")
-public class ShowCommand implements IWalleCommand {
+class ShowCommand : IWalleCommand {
 
-    @Parameter(required = true, description = "file1 file2 file3 ...", converter = FileConverter.class, variableArity = true)
-    private List<File> files;
+    @Parameter(required = true, description = "file1 file2 file3 ...", converter = FileConverter::class, variableArity = true)
+    private var files: List<File>? = null
 
-    @Parameter(names = {"-e", "--extraInfo"}, description = "get channel extra info")
-    private boolean showExtraInfo;
+    @Parameter(names = ["-e", "--extraInfo"], description = "get channel extra info")
+    private var showExtraInfo: Boolean = false
 
-    @Parameter(names = {"-c", "--channel"}, description = "get channel")
-    private boolean shoChannel;
+    @Parameter(names = ["-c", "--channel"], description = "get channel")
+    private var showChannel: Boolean = false
 
-    @Parameter(names = {"-r", "--raw"}, description = "get raw string from Channel id")
-    private boolean showRaw;
+    @Parameter(names = ["-r", "--raw"], description = "get raw string from Channel id")
+    private var showRaw: Boolean = false
 
-    @Override
-    public void parse() {
-        if (showRaw) {
-            printInfo(new Fun1<File, String>() {
-                @Override
-                public String apply(final File file) {
-                    final String rawChannelInfo = ChannelReader.getRaw(file);
-                    return rawChannelInfo == null ? "" : rawChannelInfo;
-                }
-            });
-        }
-        if (showExtraInfo) {
-            printInfo(new Fun1<File, String>() {
-                @Override
-                public String apply(final File file) {
-                    final ChannelInfo channelInfo = ChannelReader.get(file);
-                    if (channelInfo == null) {
-                        return "";
+    override fun parse() {
+        when {
+            showRaw -> {
+                printInfo(object : Fun1<File, String> {
+                    override fun apply(file: File): String {
+                        return ChannelReader.getRaw(file) ?: ""
                     }
-                    final Map<String, String> map = channelInfo.getExtraInfo();
-                    return map == null ? "" : map.toString();
-                }
-            });
-            return;
-        }
-        if (shoChannel) {
-            printInfo(new Fun1<File, String>() {
-                @Override
-                public String apply(final File file) {
-                    final ChannelInfo channelInfo = ChannelReader.get(file);
-                    if (channelInfo == null) {
-                        return "";
-                    }
-                    return channelInfo.getChannel();
-                }
-            });
-            return;
-        }
-        printInfo(new Fun1<File, String>() {
-            @Override
-            public String apply(final File file) {
-                final Map<String, String> map = ChannelReader.getMap(file);
-                return map == null ? "" : map.toString();
+                })
             }
-        });
+            showExtraInfo -> {
+                printInfo(object : Fun1<File, String> {
+                    override fun apply(file: File): String {
+                        val channelInfo = ChannelReader.get(file)
+                        return channelInfo?.extraInfo?.toString() ?: ""
+                    }
+                })
+                return
+            }
+            showChannel -> {
+                printInfo(object : Fun1<File, String> {
+                    override fun apply(file: File): String {
+                        val channelInfo = ChannelReader.get(file)
+                        return channelInfo?.channel ?: ""
+                    }
+                })
+                return
+            }
+            else -> {
+                printInfo(object : Fun1<File, String> {
+                    override fun apply(file: File): String {
+                        return ChannelReader.getMap(file)?.toString() ?: ""
+                    }
+                })
+            }
+        }
     }
 
-    private void printInfo(final Fun1<File, String> fun) {
-        for (File file : files) {
-            System.out.println(file.getAbsolutePath() + " : " + fun.apply(file));
+    private fun printInfo(fun1: Fun1<File, String>) {
+        files?.forEach { file ->
+            println("${file.absolutePath} : ${fun1.apply(file)}")
         }
     }
 }

@@ -1,94 +1,80 @@
-package com.meituan.android.walle.commands;
+package com.meituan.android.walle.commands
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.beust.jcommander.converters.FileConverter;
-import com.google.gson.Gson;
-import com.meituan.android.walle.ChannelWriter;
-import com.meituan.android.walle.SignatureNotFoundException;
-import com.meituan.android.walle.WalleConfig;
-import com.meituan.android.walle.utils.Util;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.beust.jcommander.Parameter
+import com.beust.jcommander.Parameters
+import com.beust.jcommander.converters.FileConverter
+import com.google.gson.Gson
+import com.meituan.android.walle.ChannelWriter
+import com.meituan.android.walle.WalleConfig
+import com.meituan.android.walle.utils.Util
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 
 @Parameters(commandDescription = "channel apk batch production")
-public class Batch2Command implements IWalleCommand {
+class Batch2Command : IWalleCommand {
 
-    @Parameter(required = true, description = "inputFile [outputDirectory]", arity = 2, converter = FileConverter.class)
-    private List<File> files;
+    @Parameter(required = true, description = "inputFile [outputDirectory]", arity = 2, converter = FileConverter::class)
+    private var files: List<File>? = null
 
-    @Parameter(names = {"-f", "--configFile"}, description = "config file (json)")
-    private File configFile;
+    @Parameter(names = ["-f", "--configFile"], description = "config file (json)")
+    private var configFile: File? = null
 
-    @Override
-    public void parse() {
-        final File inputFile = files.get(0);
-        File outputDir = null;
-        if (files.size() == 2) {
-            outputDir = Util.removeDirInvalidChar(files.get(1));
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
+    override fun parse() {
+        val inputFile = files!![0]
+        val outputDir: File = if (files!!.size == 2) {
+            Util.removeDirInvalidChar(files!![1]).apply {
+                if (!exists()) {
+                    mkdirs()
+                }
             }
         } else {
-            outputDir = inputFile.getParentFile();
+            inputFile.parentFile
         }
 
-        if (configFile != null) {
+        configFile?.let { file ->
             try {
-                final WalleConfig config = new Gson().fromJson(new InputStreamReader(new FileInputStream(configFile), "UTF-8"), WalleConfig.class);
-                final Map<String, String> defaultExtraInfo = config.getDefaultExtraInfo();
-                final List<WalleConfig.ChannelInfo> channelInfoList = config.getChannelInfoList();
-                for (WalleConfig.ChannelInfo channelInfo : channelInfoList) {
-                    Map<String, String> extraInfo = channelInfo.getExtraInfo();
-                    if (!channelInfo.isExcludeDefaultExtraInfo()) {
-                        switch (config.getDefaultExtraInfoStrategy()) {
-                            case WalleConfig.STRATEGY_IF_NONE:
+                val config = Gson().fromJson(InputStreamReader(FileInputStream(file), "UTF-8"), WalleConfig::class.java)
+                val defaultExtraInfo = config.defaultExtraInfo
+                val channelInfoList = config.channelInfoList
+                channelInfoList?.forEach { channelInfo ->
+                    var extraInfo = channelInfo.extraInfo
+                    if (!channelInfo.isExcludeDefaultExtraInfo) {
+                        when (config.defaultExtraInfoStrategy) {
+                            WalleConfig.STRATEGY_IF_NONE -> {
                                 if (extraInfo == null) {
-                                    extraInfo = defaultExtraInfo;
+                                    extraInfo = defaultExtraInfo
                                 }
-                                break;
-                            case WalleConfig.STRATEGY_ALWAYS:
-                                final Map<String, String> temp = new HashMap<>();
-                                if (defaultExtraInfo != null) {
-                                    temp.putAll(defaultExtraInfo);
-                                }
-                                if (extraInfo != null) {
-                                    temp.putAll(extraInfo);
-                                }
-                                extraInfo = temp;
-                                break;
-                            default:
-                                break;
+                            }
+                            WalleConfig.STRATEGY_ALWAYS -> {
+                                val temp = mutableMapOf<String, String>()
+                                defaultExtraInfo?.let { temp.putAll(it) }
+                                extraInfo?.let { temp.putAll(it) }
+                                extraInfo = temp
+                            }
                         }
                     }
-                    generateChannelApk(inputFile, outputDir, channelInfo.getChannel(), channelInfo.getAlias(), extraInfo);
+                    generateChannelApk(inputFile, outputDir, channelInfo.channel, channelInfo.alias, extraInfo)
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
 
-    private void generateChannelApk(final File inputFile, final File outputDir, final String channel, final String alias, final Map<String, String> extraInfo) {
-        final String channelName = alias == null ? channel : alias;
-        final String name = FilenameUtils.getBaseName(inputFile.getName());
-        final String extension = FilenameUtils.getExtension(inputFile.getName());
-        final String newName = name + "_" + channelName + "." + extension;
-        final File channelApk = new File(outputDir, newName);
+    private fun generateChannelApk(inputFile: File, outputDir: File, channel: String?, alias: String?, extraInfo: Map<String, String>?) {
+        val channelName = alias ?: channel
+        val name = FilenameUtils.getBaseName(inputFile.name)
+        val extension = FilenameUtils.getExtension(inputFile.name)
+        val newName = "${name}_${channelName}.${extension}"
+        val channelApk = File(outputDir, newName)
         try {
-            FileUtils.copyFile(inputFile, channelApk);
-            ChannelWriter.put(channelApk, channel, extraInfo);
-        } catch (IOException | SignatureNotFoundException e) {
-            e.printStackTrace();
+            FileUtils.copyFile(inputFile, channelApk)
+            ChannelWriter.put(channelApk, channel, extraInfo)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

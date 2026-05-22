@@ -1,56 +1,55 @@
-package com.meituan.android.walle;
+package com.meituan.android.walle
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
+import com.beust.jcommander.JCommander
+import com.beust.jcommander.Parameter
+import java.io.IOException
+import java.net.URL
+import java.util.Enumeration
+import java.util.jar.Attributes
+import java.util.jar.JarFile
+import java.util.jar.Manifest
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
+class WalleCommandLine {
+    @Parameter(names = ["-v", "--version"], description = "show walle version")
+    private var showVersion: Boolean = false
 
+    @Parameter(names = ["-h", "--help"], description = "show walle command line help")
+    private var showHelp: Boolean = false
 
-public class WalleCommandLine {
-    @Parameter(names = {"-v", "--version"}, description = "show walle version")
-    private boolean showVersion;
-
-    @Parameter(names = {"-h", "--help"}, description = "show walle command line help")
-    private boolean showHelp;
-
-    public void parse(final JCommander commander) {
+    fun parse(commander: JCommander) {
         if (showVersion) {
-            System.out.println(getVersion());
-            return;
+            println(getVersion())
+            return
         }
         if (showHelp) {
-            commander.usage();
+            commander.usage()
         }
     }
 
-    private static String getVersion() {
-        try {
-            final Enumeration resEnum = Thread.currentThread().getContextClassLoader().getResources(JarFile.MANIFEST_NAME);
-            while (resEnum.hasMoreElements()) {
-                try {
-                    final URL url = (URL) resEnum.nextElement();
-                    final InputStream is = url.openStream();
-                    if (is != null) {
-                        final Manifest manifest = new Manifest(is);
-                        final Attributes mainAttribs = manifest.getMainAttributes();
-                        final String version = mainAttribs.getValue("Walle-Version");
-                        if (version != null) {
-                            return version;
+    companion object {
+        private fun getVersion(): String? {
+            try {
+                val resEnum: Enumeration<URL> = Thread.currentThread().contextClassLoader.getResources(JarFile.MANIFEST_NAME)
+                while (resEnum.hasMoreElements()) {
+                    try {
+                        val url = resEnum.nextElement()
+                        val inputStream = url.openStream()
+                        if (inputStream != null) {
+                            val manifest = Manifest(inputStream)
+                            val mainAttribs: Attributes = manifest.mainAttributes
+                            val version = mainAttribs.getValue("Walle-Version")
+                            if (version != null) {
+                                return version
+                            }
                         }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
-        } catch (IOException e1) {
-            e1.printStackTrace();
+            return null
         }
-        return null;
     }
 }

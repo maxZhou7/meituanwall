@@ -1,28 +1,20 @@
-package com.meituan.android.walle.utils;
+package com.meituan.android.walle.utils
 
-import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.IStringConverter
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Created by chentong on 21/11/2016.
- */
-
-public class CommaSeparatedKeyValueConverter implements IStringConverter<Map<String, String>> {
-    @Override
-    public Map<String, String> convert(final String value) {
-        Map<String, String> result = null;
+class CommaSeparatedKeyValueConverter : IStringConverter<Map<String, String>> {
+    override fun convert(value: String): Map<String, String>? {
+        var result: MutableMap<String, String>? = null
         if (!Util.isTextEmpty(value)) {
-            final String[] temp = value.split(",");
-            result = new HashMap<String, String>(temp.length);
-            for (String s : temp) {
-                final String[] keyValue = s.split("=");
-                if (keyValue.length == 2) {
-                    result.put(keyValue[0], keyValue[1]);
+            val temp = value.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            result = HashMap(temp.size)
+            for (s in temp) {
+                val keyValue = s.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                if (keyValue.size == 2) {
+                    result[keyValue[0]] = keyValue[1]
                 }
             }
         }
-        return result;
+        return result
     }
 }

@@ -1,85 +1,32 @@
-package com.meituan.android.walle;
+package com.meituan.android.walle
 
-import java.util.List;
-import java.util.Map;
+class WalleConfig {
 
-public class WalleConfig {
-
-    /**
-     * strategy:
-     * 1. ifNone (默认适用此策略) : 仅当对应channel没有extraInfo时生效
-     * 2. always : 所有channel都生效，channel中extraInfo的key与defaultExtraInfo重复时，覆盖defaultExtraInfo中的内容。
-     */
-    public static final String STRATEGY_IF_NONE = "ifNone";
-    public static final String STRATEGY_ALWAYS = "always";
-    private String defaultExtraInfoStrategy = STRATEGY_IF_NONE;
-
-    public String getDefaultExtraInfoStrategy() {
-        return defaultExtraInfoStrategy;
+    companion object {
+        /**
+         * strategy:
+         * 1. ifNone (默认适用此策略) : 仅当对应channel没有extraInfo时生效
+         * 2. always : 所有channel都生效，channel中extraInfo的key与defaultExtraInfo重复时，覆盖defaultExtraInfo中的内容。
+         */
+        const val STRATEGY_IF_NONE = "ifNone"
+        const val STRATEGY_ALWAYS = "always"
     }
 
-    public void setDefaultExtraInfoStrategy(final String defaultExtraInfoStrategy) {
-        this.defaultExtraInfoStrategy = defaultExtraInfoStrategy;
-    }
+    var defaultExtraInfoStrategy: String = STRATEGY_IF_NONE
 
-    private Map<String, String> defaultExtraInfo;
+    var defaultExtraInfo: Map<String, String>? = null
 
-    public List<ChannelInfo> getChannelInfoList() {
-        return channelInfoList;
-    }
+    var channelInfoList: List<ChannelInfo>? = null
 
-    public void setChannelInfoList(final List<ChannelInfo> channelInfoList) {
-        this.channelInfoList = channelInfoList;
-    }
-
-    private List<ChannelInfo> channelInfoList;
-
-    public Map<String, String> getDefaultExtraInfo() {
-        return defaultExtraInfo;
-    }
-
-    public void setDefaultExtraInfo(final Map<String, String> defaultExtraInfo) {
-        this.defaultExtraInfo = defaultExtraInfo;
-    }
-
-    public static class ChannelInfo {
-        private String channel;
-        private String alias;
-
-        public String getAlias() {
-            return alias;
-        }
-
-        public void setAlias(final String alias) {
-            this.alias = alias;
-        }
+    class ChannelInfo {
+        var channel: String? = null
+        var alias: String? = null
 
         /**
          * 强制声明不使用defaultExtraInfo参数
          */
-        private boolean excludeDefaultExtraInfo;
+        var isExcludeDefaultExtraInfo: Boolean = false
 
-        public boolean isExcludeDefaultExtraInfo() {
-            return excludeDefaultExtraInfo;
-        }
-
-        private Map<String, String> extraInfo;
-
-        public String getChannel() {
-            return channel;
-        }
-
-        public void setChannel(final String channel) {
-            this.channel = channel;
-        }
-
-        public Map<String, String> getExtraInfo() {
-            return extraInfo;
-        }
-
-        public void setExtraInfo(final Map<String, String> extraInfo) {
-            this.extraInfo = extraInfo;
-        }
+        var extraInfo: Map<String, String>? = null
     }
 }
-

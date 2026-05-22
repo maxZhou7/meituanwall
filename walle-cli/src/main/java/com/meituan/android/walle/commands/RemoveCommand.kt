@@ -1,42 +1,35 @@
-package com.meituan.android.walle.commands;
+package com.meituan.android.walle.commands
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.beust.jcommander.converters.FileConverter;
-import com.meituan.android.walle.ChannelWriter;
-import com.meituan.android.walle.SignatureNotFoundException;
-import com.meituan.android.walle.utils.Fun1;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
+import com.beust.jcommander.Parameter
+import com.beust.jcommander.Parameters
+import com.beust.jcommander.converters.FileConverter
+import com.meituan.android.walle.ChannelWriter
+import com.meituan.android.walle.utils.Fun1
+import java.io.File
 
 @Parameters(commandDescription = "remove channel info for apk")
-public class RemoveCommand implements IWalleCommand {
+class RemoveCommand : IWalleCommand {
 
-    @Parameter(required = true, description = "file1 file2 file3 ...", converter = FileConverter.class, variableArity = true)
-    private List<File> files;
+    @Parameter(required = true, description = "file1 file2 file3 ...", converter = FileConverter::class, variableArity = true)
+    private var files: List<File>? = null
 
-    @Override
-    public void parse() {
-        removeInfo(new Fun1<File, Boolean>() {
-            @Override
-            public Boolean apply(final File file) {
-                try {
-                    ChannelWriter.remove(file);
-                    return true;
-                } catch (IOException | SignatureNotFoundException e) {
-                    e.printStackTrace();
+    override fun parse() {
+        removeInfo(object : Fun1<File, Boolean> {
+            override fun apply(file: File): Boolean {
+                return try {
+                    ChannelWriter.remove(file)
+                    true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    false
                 }
-                return false;
             }
-        });
+        })
     }
 
-    private void removeInfo(final Fun1<File, Boolean> fun) {
-        for (File file : files) {
-            System.out.println(file.getAbsolutePath() + " : " + fun.apply(file));
+    private fun removeInfo(fun1: Fun1<File, Boolean>) {
+        files?.forEach { file ->
+            println("${file.absolutePath} : ${fun1.apply(file)}")
         }
     }
 }

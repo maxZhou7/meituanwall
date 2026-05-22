@@ -16,10 +16,15 @@ java {
 }
 
 jar {
+    archiveClassifier = 'all'
     manifest {
         attributes 'Main-Class': 'com.meituan.android.walle.Main'
         attributes 'Walle-Version': VERSION_NAME
     }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 dependencies {

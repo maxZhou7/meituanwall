@@ -1,54 +1,45 @@
-package com.meituan.android.walle;
+package com.meituan.android.walle
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
-import com.meituan.android.walle.commands.Batch2Command;
-import com.meituan.android.walle.commands.IWalleCommand;
-import com.meituan.android.walle.commands.RemoveCommand;
-import com.meituan.android.walle.commands.ShowCommand;
-import com.meituan.android.walle.commands.PutCommand;
-import com.meituan.android.walle.commands.BatchCommand;
+import com.beust.jcommander.JCommander
+import com.beust.jcommander.ParameterException
+import com.meituan.android.walle.commands.Batch2Command
+import com.meituan.android.walle.commands.BatchCommand
+import com.meituan.android.walle.commands.IWalleCommand
+import com.meituan.android.walle.commands.PutCommand
+import com.meituan.android.walle.commands.RemoveCommand
+import com.meituan.android.walle.commands.ShowCommand
 
-import java.util.HashMap;
-import java.util.Map;
+object Main {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val subCommandList = mutableMapOf<String, IWalleCommand>()
+        subCommandList["show"] = ShowCommand()
+        subCommandList["rm"] = RemoveCommand()
+        subCommandList["put"] = PutCommand()
+        subCommandList["batch"] = BatchCommand()
+        subCommandList["batch2"] = Batch2Command()
 
-/**
- * Created by chentong on 20/11/2016.
- */
+        val walleCommandLine = WalleCommandLine()
+        val commander = JCommander(walleCommandLine)
 
-public final class Main {
-    private Main() {
-        super();
-    }
-
-    public static void main(final String[] args) throws Exception {
-        final Map<String, IWalleCommand> subCommandList = new HashMap<String, IWalleCommand>();
-        subCommandList.put("show", new ShowCommand());
-        subCommandList.put("rm", new RemoveCommand());
-        subCommandList.put("put", new PutCommand());
-        subCommandList.put("batch", new BatchCommand());
-        subCommandList.put("batch2", new Batch2Command());
-
-        final WalleCommandLine walleCommandLine = new WalleCommandLine();
-        final JCommander commander = new JCommander(walleCommandLine);
-
-        for (Map.Entry<String, IWalleCommand> commandEntry : subCommandList.entrySet()) {
-            commander.addCommand(commandEntry.getKey(), commandEntry.getValue());
+        subCommandList.forEach { (key, value) ->
+            commander.addCommand(key, value)
         }
+
         try {
-            commander.parse(args);
-        } catch (ParameterException e) {
-            System.out.println(e.getMessage());
-            commander.usage();
-            System.exit(1);
-            return;
+            commander.parse(*args)
+        } catch (e: ParameterException) {
+            println(e.message)
+            commander.usage()
+            System.exit(1)
+            return
         }
 
-        walleCommandLine.parse(commander);
+        walleCommandLine.parse(commander)
 
-        final String parseCommand = commander.getParsedCommand();
+        val parseCommand = commander.parsedCommand
         if (parseCommand != null) {
-            subCommandList.get(parseCommand).parse();
+            subCommandList[parseCommand]?.parse()
         }
     }
 }

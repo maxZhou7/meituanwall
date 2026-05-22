@@ -1,86 +1,78 @@
-package com.meituan.android.walle.commands;
+package com.meituan.android.walle.commands
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.beust.jcommander.converters.FileConverter;
-import com.meituan.android.walle.ChannelWriter;
-import com.meituan.android.walle.SignatureNotFoundException;
-import com.meituan.android.walle.utils.CommaSeparatedKeyValueConverter;
-import com.meituan.android.walle.utils.Util;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import com.beust.jcommander.Parameter
+import com.beust.jcommander.Parameters
+import com.beust.jcommander.converters.FileConverter
+import com.meituan.android.walle.ChannelWriter
+import com.meituan.android.walle.utils.CommaSeparatedKeyValueConverter
+import com.meituan.android.walle.utils.Util
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.IOUtils
+import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
 
 @Parameters(commandDescription = "channel apk batch production")
-public class BatchCommand implements IWalleCommand {
+class BatchCommand : IWalleCommand {
 
-    @Parameter(required = true, description = "inputFile [outputDirectory]", arity = 2, converter = FileConverter.class)
-    private List<File> files;
+    @Parameter(required = true, description = "inputFile [outputDirectory]", arity = 2, converter = FileConverter::class)
+    private var files: List<File>? = null
 
-    @Parameter(names = {"-e", "--extraInfo"}, converter = CommaSeparatedKeyValueConverter.class, description = "Comma-separated list of key=value info, eg: -e time=1,type=android")
-    private Map<String, String> extraInfo;
+    @Parameter(names = ["-e", "--extraInfo"], converter = CommaSeparatedKeyValueConverter::class, description = "Comma-separated list of key=value info, eg: -e time=1,type=android")
+    private var extraInfo: Map<String, String>? = null
 
-    @Parameter(names = {"-c", "--channelList"}, description = "Comma-separated list of channel, eg: -c meituan,xiaomi")
-    private List<String> channelList;
+    @Parameter(names = ["-c", "--channelList"], description = "Comma-separated list of channel, eg: -c meituan,xiaomi")
+    private var channelList: List<String>? = null
 
-    @Parameter(names = {"-f", "--channelFile"}, description = "channel file")
-    private File channelFile;
+    @Parameter(names = ["-f", "--channelFile"], description = "channel file")
+    private var channelFile: File? = null
 
-    @Override
-    public void parse() {
-        final File inputFile = files.get(0);
-        File outputDir = null;
-        if (files.size() == 2) {
-            outputDir = Util.removeDirInvalidChar(files.get(1));
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
+    override fun parse() {
+        val inputFile = files!![0]
+        val outputDir: File = if (files!!.size == 2) {
+            Util.removeDirInvalidChar(files!![1]).apply {
+                if (!exists()) {
+                    mkdirs()
+                }
             }
         } else {
-            outputDir = inputFile.getParentFile();
+            inputFile.parentFile
         }
 
-        if (channelList != null) {
-            for (String channel : channelList) {
-                generateChannelApk(inputFile, outputDir, channel);
-            }
+        channelList?.forEach { channel ->
+            generateChannelApk(inputFile, outputDir, channel)
         }
 
-        if (channelFile != null) {
+        channelFile?.let { file ->
             try {
-                final List<String> lines = IOUtils.readLines(new FileInputStream(channelFile), "UTF-8");
-                for (String line : lines) {
-                    final String lineTrim = line.trim();
-                    if (lineTrim.length() == 0 || lineTrim.startsWith("#")) {
-                        continue;
+                val lines = IOUtils.readLines(FileInputStream(file), "UTF-8")
+                for (line in lines) {
+                    val lineTrim = line.trim()
+                    if (lineTrim.isEmpty() || lineTrim.startsWith("#")) {
+                        continue
                     }
-                    final String channel = line.split("#")[0].trim();
-                    if (channel.length() != 0) {
-                        generateChannelApk(inputFile, outputDir, channel);
+                    val channel = line.split("#")[0].trim()
+                    if (channel.isNotEmpty()) {
+                        generateChannelApk(inputFile, outputDir, channel)
                     }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
         }
     }
 
-    private void generateChannelApk(final File inputFile, final File outputDir, final String channel) {
-        final String name = FilenameUtils.getBaseName(inputFile.getName());
-        final String extension = FilenameUtils.getExtension(inputFile.getName());
-        final String newName = name + "_" + channel + "." + extension;
-        final File channelApk = new File(outputDir, newName);
+    private fun generateChannelApk(inputFile: File, outputDir: File, channel: String) {
+        val name = FilenameUtils.getBaseName(inputFile.name)
+        val extension = FilenameUtils.getExtension(inputFile.name)
+        val newName = "${name}_${channel}.${extension}"
+        val channelApk = File(outputDir, newName)
         try {
-            FileUtils.copyFile(inputFile, channelApk);
-            ChannelWriter.put(channelApk, channel, extraInfo);
-        } catch (IOException | SignatureNotFoundException e) {
-            e.printStackTrace();
+            FileUtils.copyFile(inputFile, channelApk)
+            ChannelWriter.put(channelApk, channel, extraInfo)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

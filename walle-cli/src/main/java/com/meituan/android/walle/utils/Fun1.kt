@@ -1,6 +1,5 @@
-package com.meituan.android.walle.utils;
+package com.meituan.android.walle.utils
 
-
-public interface Fun1<T, R> {
-    R apply(T v);
+interface Fun1<T, R> {
+    fun apply(v: T): R
 }
