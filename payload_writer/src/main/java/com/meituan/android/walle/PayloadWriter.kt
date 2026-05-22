@@ -176,10 +176,10 @@ object PayloadWriter {
             val centralDirStartOffset = ApkUtil.findCentralDirStartOffset(fileChannel, commentLength)
             // Find the APK Signing Block. The block immediately precedes the Central Directory.
             val apkSigningBlockAndOffset = ApkUtil.findApkSigningBlock(fileChannel, centralDirStartOffset)
-            val apkSigningBlock2 = apkSigningBlockAndOffset.first
-            val apkSigningBlockOffset = apkSigningBlockAndOffset.second
+            val apkSigningBlock2 = apkSigningBlockAndOffset.getFirst()
+            val apkSigningBlockOffset = apkSigningBlockAndOffset.getSecond()
 
-            val originIdValues = ApkUtil.findIdValues(apkSigningBlock2)
+            val originIdValues = LinkedHashMap(ApkUtil.findIdValues(apkSigningBlock2))
             // Find the APK Signature Scheme v2 Block inside the APK Signing Block.
             val apkSignatureSchemeV2Block = originIdValues[ApkUtil.APK_SIGNATURE_SCHEME_V2_BLOCK_ID]
 
@@ -188,7 +188,7 @@ object PayloadWriter {
             }
 
             val needPadding = originIdValues.remove(ApkUtil.VERITY_PADDING_BLOCK_ID) != null
-            val apkSigningBlock = handler.handle(originIdValues)
+            val apkSigningBlock = handler.handle(LinkedHashMap(originIdValues))
             // replace VERITY_PADDING_BLOCK with new one
             if (needPadding) {
                 // uint64:  size (excluding this field)
