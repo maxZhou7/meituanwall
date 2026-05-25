@@ -2,7 +2,6 @@ package com.meituan.android.walle.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
-import com.beust.jcommander.converters.FileConverter
 import com.meituan.android.walle.ChannelWriter
 import com.meituan.android.walle.utils.CommaSeparatedKeyValueConverter
 import com.meituan.android.walle.utils.Util
@@ -16,8 +15,8 @@ import java.io.IOException
 @Parameters(commandDescription = "channel apk batch production")
 class BatchCommand : IWalleCommand {
 
-    @Parameter(required = true, description = "inputFile [outputDirectory]", arity = 2, converter = FileConverter::class)
-    private var files: List<File>? = null
+    @Parameter(required = true, description = "inputFile [outputDirectory]", arity = 2)
+    private var files: List<String>? = null
 
     @Parameter(names = ["-e", "--extraInfo"], converter = CommaSeparatedKeyValueConverter::class, description = "Comma-separated list of key=value info, eg: -e time=1,type=android")
     private var extraInfo: Map<String, String>? = null
@@ -29,9 +28,10 @@ class BatchCommand : IWalleCommand {
     private var channelFile: File? = null
 
     override fun parse() {
-        val inputFile = files!![0]
-        val outputDir: File = if (files!!.size == 2) {
-            Util.removeDirInvalidChar(files!![1]).apply {
+        val fileList = files!!.map { File(it) }
+        val inputFile = fileList[0]
+        val outputDir: File = if (fileList.size == 2) {
+            Util.removeDirInvalidChar(fileList[1]).apply {
                 if (!exists()) {
                     mkdirs()
                 }

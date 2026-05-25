@@ -2,7 +2,6 @@ package com.meituan.android.walle.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
-import com.beust.jcommander.converters.FileConverter
 import com.meituan.android.walle.ChannelWriter
 import com.meituan.android.walle.utils.CommaSeparatedKeyValueConverter
 import org.apache.commons.io.FileUtils
@@ -12,8 +11,8 @@ import java.io.File
 @Parameters(commandDescription = "put channel info into apk")
 class PutCommand : IWalleCommand {
 
-    @Parameter(required = true, description = "inputFile [outputFile]", arity = 2, converter = FileConverter::class)
-    private var files: List<File>? = null
+    @Parameter(required = true, description = "inputFile [outputFile]", arity = 2)
+    private var files: List<String>? = null
 
     @Parameter(names = ["-e", "--extraInfo"], converter = CommaSeparatedKeyValueConverter::class, description = "Comma-separated list of key=value info, eg: -e time=1,type=android")
     private var extraInfo: Map<String, String>? = null
@@ -22,9 +21,10 @@ class PutCommand : IWalleCommand {
     private var channel: String? = null
 
     override fun parse() {
-        val inputFile = files!![0]
-        val outputFile: File = if (files!!.size == 2) {
-            files!![1]
+        val fileList = files!!.map { File(it) }
+        val inputFile = fileList[0]
+        val outputFile: File = if (fileList.size == 2) {
+            fileList[1]
         } else {
             val name = FilenameUtils.getBaseName(inputFile.name)
             val extension = FilenameUtils.getExtension(inputFile.name)

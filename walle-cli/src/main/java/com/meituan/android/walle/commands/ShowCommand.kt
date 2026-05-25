@@ -2,7 +2,6 @@ package com.meituan.android.walle.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
-import com.beust.jcommander.converters.FileConverter
 import com.meituan.android.walle.ChannelReader
 import com.meituan.android.walle.utils.Fun1
 import java.io.File
@@ -10,8 +9,8 @@ import java.io.File
 @Parameters(commandDescription = "get channel info from apk and show all by default")
 class ShowCommand : IWalleCommand {
 
-    @Parameter(required = true, description = "file1 file2 file3 ...", converter = FileConverter::class, variableArity = true)
-    private var files: List<File>? = null
+    @Parameter(required = true, description = "file1 file2 file3 ...", variableArity = true)
+    private var filePaths: List<String>? = null
 
     @Parameter(names = ["-e", "--extraInfo"], description = "get channel extra info")
     private var showExtraInfo: Boolean = false
@@ -60,7 +59,7 @@ class ShowCommand : IWalleCommand {
     }
 
     private fun printInfo(fun1: Fun1<File, String>) {
-        files?.forEach { file ->
+        filePaths?.map { File(it) }?.forEach { file ->
             println("${file.absolutePath} : ${fun1.apply(file)}")
         }
     }
