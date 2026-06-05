@@ -404,6 +404,15 @@ cd walle
 ./gradlew :payload_reader:publishToMavenLocal :library:publishToMavenLocal :plugin:publishToMavenLocal
 ```
 
+## 📌 版本选择指南
+
+| 版本 | 适用 Gradle 版本 | 说明 |
+|------|-----------------|------|
+| **v2.1.0** | 所有 Gradle 版本 | 兼容所有 Gradle 版本，已适配 AGP 8.x |
+| **v2.1.4** | Gradle 9.0+ | 已适配 AGP 9.0+，支持新 Variant API |
+
+> **注意**：Library 模块（`walle`）和命令行工具（CLI）兼容所有版本，只有 Gradle 插件（`walle-plugin`）需要根据 Gradle 版本选择。
+
 ## 🔗 升级说明
 
 ### 本次升级内容

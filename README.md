@@ -454,6 +454,15 @@ cd walle
 ./gradlew :payload_reader:publishToMavenLocal :library:publishToMavenLocal :plugin:publishToMavenLocal
 ```
 
+## 📌 Version Selection Guide
+
+| Version | Applicable Gradle Version | Description |
+|---------|--------------------------|-------------|
+| **v2.1.0** | All Gradle versions | Compatible with all Gradle versions, adapted for AGP 8.x |
+| **v2.1.4** | Gradle 9.0+ | Adapted for AGP 9.0+, supports new Variant API |
+
+> **Note**: The library module (`walle`) and CLI tool are compatible with all versions. Only the Gradle plugin (`walle-plugin`) version needs to be selected based on your Gradle version.
+
 ## 📈 Upgrade Notes
 
 ### Current Upgrade Content
