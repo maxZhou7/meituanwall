@@ -67,7 +67,7 @@ class GradlePlugin : Plugin<Project> {
             )
         }
 
-        // AGP 8.x version check
+        // Detect AGP version
         var agpVersion: String? = null
         try {
             val clazz = Class.forName("com.android.Version")
@@ -90,19 +90,25 @@ class GradlePlugin : Plugin<Project> {
         }
 
         applyExtension(project)
-        applyTask(project)
+        // Pass AGP version to determine which API to use
+        val isAgp9Plus = agpVersion != null && versionCompare(agpVersion, "9.0.0") >= 0
+        applyTask(project, isAgp9Plus)
     }
 
     private fun applyExtension(project: Project) {
         project.extensions.create(PLUGIN_EXTENSION_NAME, Extension::class.java, project)
     }
 
-    private fun applyTask(project: Project) {
+    private fun applyTask(project: Project, isAgp9Plus: Boolean) {
         project.afterEvaluate {
-            // AGP 9.0 uses androidComponents API
-            val androidComponents = project.extensions.findByName("androidComponents")
-            if (androidComponents != null) {
-                // AGP 9.0+ approach using new Variant API
+            if (isAgp9Plus) {
+                // ========== AGP 9.0+ approach ==========
+                val androidComponents = project.extensions.findByName("androidComponents")
+                if (androidComponents == null) {
+                    project.logger.warn("[Walle] androidComponents extension not found, cannot register channel tasks")
+                    return@afterEvaluate
+                }
+
                 try {
                     val onVariantsMethod = androidComponents.javaClass.getMethod("onVariants", Function1::class.java)
                     @Suppress("UNCHECKED_CAST")
@@ -110,71 +116,25 @@ class GradlePlugin : Plugin<Project> {
                         val variantName = variant.javaClass.getMethod("getName").invoke(variant) as String
                         val capitalizedVariantName = variantName.replaceFirstChar { it.uppercase() }
 
-                        // Register clean channel folder task
-                        val cleanChannelTask = project.tasks.register("clean${capitalizedVariantName}ChannelFolder") { task ->
-                            task.description = "Clean channel output folder before packaging"
-                            task.group = "Package"
+                        val cleanChannelTask = createCleanChannelTask(project, variantName, capitalizedVariantName)
 
-                            task.doLast {
-                                val extension = Extension.getConfig(project)
-                                val channelOutputFolder = extension.apkOutputFolder
-
-                                // If custom output folder is configured, clean it
-                                if (channelOutputFolder is File && channelOutputFolder.exists()) {
-                                    project.logger.lifecycle("[Walle] Cleaning channel output folder: ${channelOutputFolder.absolutePath}")
-                                    var deletedCount = 0
-                                    channelOutputFolder.listFiles()?.forEach { f ->
-                                        if (f.name.endsWith(".apk")) {
-                                            f.delete()
-                                            deletedCount++
-                                            project.logger.info("[Walle] Deleted: ${f.name}")
-                                        }
-                                    }
-                                    project.logger.lifecycle("[Walle] Deleted $deletedCount APK file(s)")
-                                } else {
-                                    // Otherwise clean the default output location
-                                    val defaultOutputFolder = File(
-                                        project.layout.buildDirectory.get().asFile,
-                                        "outputs/apk/$variantName"
-                                    )
-                                    if (defaultOutputFolder.exists()) {
-                                        project.logger.lifecycle("[Walle] Cleaning default output folder: ${defaultOutputFolder.absolutePath}")
-                                        var deletedCount = 0
-                                        defaultOutputFolder.listFiles()?.forEach { f ->
-                                            if (f.name.endsWith(".apk")) {
-                                                f.delete()
-                                                deletedCount++
-                                                project.logger.info("[Walle] Deleted: ${f.name}")
-                                            }
-                                        }
-                                        project.logger.lifecycle("[Walle] Deleted $deletedCount APK file(s)")
-                                    }
-                                }
-                            }
-                        }
-
-                        // Use register() instead of create() for lazy task configuration
-                        val channelMakerTask = project.tasks.register(
+                        project.tasks.register(
                             "assemble${capitalizedVariantName}Channels",
                             ChannelMaker::class.java
                         ) { task ->
                             task.targetProject = project
-                            // Pass variant name and use adapter for AGP 9.0
                             task.variantName = variantName
                             task.setup()
-
-                            // AGP 9.0 compatibility - depend on assemble task
                             task.dependsOn("assemble$capitalizedVariantName")
-                            // Make channel maker depend on clean task
                             task.dependsOn(cleanChannelTask)
                         }
                     }
                     onVariantsMethod.invoke(androidComponents, consumer)
                 } catch (e: Exception) {
-                    project.logger.warn("Could not register tasks with androidComponents: ${e.message}")
+                    project.logger.warn("[Walle] Could not register tasks with androidComponents: ${e.message}")
                 }
             } else {
-                // Fallback for older AGP versions (8.x and below)
+                // ========== AGP 8.x approach ==========
                 try {
                     val appExtensionClass = Class.forName("com.android.build.gradle.AppExtension")
                     val androidExt = project.extensions.findByType(appExtensionClass)
@@ -186,51 +146,12 @@ class GradlePlugin : Plugin<Project> {
                             val capitalizedVariantName = variantName.replaceFirstChar { it.uppercase() }
 
                             if (!isV2SignatureSchemeEnabled(variant, project)) {
-                                project.logger.warn("Warning: APK Signature Scheme v2 may not be enabled for $variantName.")
+                                project.logger.warn("[Walle] APK Signature Scheme v2 may not be enabled for $variantName.")
                             }
 
-                            // Register clean channel folder task
-                            val cleanChannelTask = project.tasks.register("clean${capitalizedVariantName}ChannelFolder") { task ->
-                                task.description = "Clean channel output folder before packaging"
-                                task.group = "Package"
+                            val cleanChannelTask = createCleanChannelTaskAgp8(project, variantName, capitalizedVariantName)
 
-                                task.doLast {
-                                    val extension = Extension.getConfig(project)
-                                    val channelOutputFolder = extension.apkOutputFolder
-
-                                    // If custom output folder is configured, clean it
-                                    if (channelOutputFolder is File && channelOutputFolder.exists()) {
-                                        project.logger.lifecycle("[Walle] Cleaning channel output folder: ${channelOutputFolder.absolutePath}")
-                                        var deletedCount = 0
-                                        channelOutputFolder.listFiles()?.forEach { f ->
-                                            if (f.name.endsWith(".apk")) {
-                                                f.delete()
-                                                deletedCount++
-                                                project.logger.info("[Walle] Deleted: ${f.name}")
-                                            }
-                                        }
-                                        project.logger.lifecycle("[Walle] Deleted $deletedCount APK file(s)")
-                                    } else {
-                                        // Otherwise clean the default output location
-                                        val defaultOutputFolder = File(project.buildDir, "outputs/apk/$variantName")
-                                        if (defaultOutputFolder.exists()) {
-                                            project.logger.lifecycle("[Walle] Cleaning default output folder: ${defaultOutputFolder.absolutePath}")
-                                            var deletedCount = 0
-                                            defaultOutputFolder.listFiles()?.forEach { f ->
-                                                if (f.name.endsWith(".apk")) {
-                                                    f.delete()
-                                                    deletedCount++
-                                                    project.logger.info("[Walle] Deleted: ${f.name}")
-                                                }
-                                            }
-                                            project.logger.lifecycle("[Walle] Deleted $deletedCount APK file(s)")
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Use register() instead of create() for lazy task configuration
-                            val channelMakerTask = project.tasks.register(
+                            project.tasks.register(
                                 "assemble${capitalizedVariantName}Channels",
                                 ChannelMaker::class.java
                             ) { task ->
@@ -238,12 +159,10 @@ class GradlePlugin : Plugin<Project> {
                                 task.variant = variant
                                 task.setup()
 
-                                // AGP 8.x compatibility
                                 try {
                                     val assembleProvider = variant.javaClass.getMethod("getAssembleProvider")
                                         .invoke(variant)
                                     task.dependsOn(assembleProvider.javaClass.getMethod("get").invoke(assembleProvider))
-                                    // Make channel maker depend on clean task
                                     task.dependsOn(cleanChannelTask)
                                 } catch (e: Exception) {
                                     task.dependsOn(variant.javaClass.getMethod("getAssemble").invoke(variant))
@@ -253,11 +172,92 @@ class GradlePlugin : Plugin<Project> {
                         }
                     }
                 } catch (e: ClassNotFoundException) {
-                    project.logger.warn("AppExtension not available (AGP 9.0+): ${e.message}")
+                    project.logger.warn("[Walle] AppExtension not available: ${e.message}")
                 }
             }
         }
     }
+
+    /**
+     * Create clean channel folder task for AGP 9.0+ (uses layout.buildDirectory)
+     */
+    private fun createCleanChannelTask(project: Project, variantName: String, capitalizedVariantName: String) =
+        project.tasks.register("clean${capitalizedVariantName}ChannelFolder") { task ->
+            task.description = "Clean channel output folder before packaging"
+            task.group = "Package"
+            task.doLast {
+                val extension = Extension.getConfig(project)
+                val channelOutputFolder = extension.apkOutputFolder
+                if (channelOutputFolder is File && channelOutputFolder.exists()) {
+                    project.logger.lifecycle("[Walle] Cleaning channel output folder: ${channelOutputFolder.absolutePath}")
+                    var deletedCount = 0
+                    channelOutputFolder.listFiles()?.forEach { f ->
+                        if (f.name.endsWith(".apk")) {
+                            f.delete()
+                            deletedCount++
+                            project.logger.info("[Walle] Deleted: ${f.name}")
+                        }
+                    }
+                    project.logger.lifecycle("[Walle] Deleted $deletedCount APK file(s)")
+                } else {
+                    val defaultOutputFolder = File(
+                        project.layout.buildDirectory.get().asFile,
+                        "outputs/apk/$variantName"
+                    )
+                    if (defaultOutputFolder.exists()) {
+                        project.logger.lifecycle("[Walle] Cleaning default output folder: ${defaultOutputFolder.absolutePath}")
+                        var deletedCount = 0
+                        defaultOutputFolder.listFiles()?.forEach { f ->
+                            if (f.name.endsWith(".apk")) {
+                                f.delete()
+                                deletedCount++
+                                project.logger.info("[Walle] Deleted: ${f.name}")
+                            }
+                        }
+                        project.logger.lifecycle("[Walle] Deleted $deletedCount APK file(s)")
+                    }
+                }
+            }
+        }
+
+    /**
+     * Create clean channel folder task for AGP 8.x (uses buildDir)
+     */
+    private fun createCleanChannelTaskAgp8(project: Project, variantName: String, capitalizedVariantName: String) =
+        project.tasks.register("clean${capitalizedVariantName}ChannelFolder") { task ->
+            task.description = "Clean channel output folder before packaging"
+            task.group = "Package"
+            task.doLast {
+                val extension = Extension.getConfig(project)
+                val channelOutputFolder = extension.apkOutputFolder
+                if (channelOutputFolder is File && channelOutputFolder.exists()) {
+                    project.logger.lifecycle("[Walle] Cleaning channel output folder: ${channelOutputFolder.absolutePath}")
+                    var deletedCount = 0
+                    channelOutputFolder.listFiles()?.forEach { f ->
+                        if (f.name.endsWith(".apk")) {
+                            f.delete()
+                            deletedCount++
+                            project.logger.info("[Walle] Deleted: ${f.name}")
+                        }
+                    }
+                    project.logger.lifecycle("[Walle] Deleted $deletedCount APK file(s)")
+                } else {
+                    val defaultOutputFolder = File(project.buildDir, "outputs/apk/$variantName")
+                    if (defaultOutputFolder.exists()) {
+                        project.logger.lifecycle("[Walle] Cleaning default output folder: ${defaultOutputFolder.absolutePath}")
+                        var deletedCount = 0
+                        defaultOutputFolder.listFiles()?.forEach { f ->
+                            if (f.name.endsWith(".apk")) {
+                                f.delete()
+                                deletedCount++
+                                project.logger.info("[Walle] Deleted: ${f.name}")
+                            }
+                        }
+                        project.logger.lifecycle("[Walle] Deleted $deletedCount APK file(s)")
+                    }
+                }
+            }
+        }
 
     private fun getSigningConfig(variant: Any, project: Project): Any? {
         return try {
