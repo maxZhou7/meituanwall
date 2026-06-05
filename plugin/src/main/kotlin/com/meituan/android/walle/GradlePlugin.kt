@@ -1,5 +1,6 @@
 package com.meituan.android.walle
 
+import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -89,6 +90,8 @@ class GradlePlugin : Plugin<Project> {
             project.logger.warn("Walle plugin is optimized for AGP 8.0+. Current version: $agpVersion")
         }
 
+        project.logger.info("[Walle] Detected AGP version: $agpVersion")
+
         applyExtension(project)
         // Pass AGP version to determine which API to use
         val isAgp9Plus = agpVersion != null && versionCompare(agpVersion, "9.0.0") >= 0
@@ -100,41 +103,62 @@ class GradlePlugin : Plugin<Project> {
     }
 
     private fun applyTask(project: Project, isAgp9Plus: Boolean) {
-        project.afterEvaluate {
-            if (isAgp9Plus) {
-                // ========== AGP 9.0+ approach ==========
-                val androidComponents = project.extensions.findByName("androidComponents")
-                if (androidComponents == null) {
-                    project.logger.warn("[Walle] androidComponents extension not found, cannot register channel tasks")
-                    return@afterEvaluate
-                }
+        if (isAgp9Plus) {
+            // ========== AGP 9.0+ approach: call onVariants directly during configuration ==========
+            // Cannot use afterEvaluate as onVariants callbacks have already executed by then
+            val androidComponents = project.extensions.findByName("androidComponents")
+            if (androidComponents == null) {
+                project.logger.warn("[Walle] androidComponents extension not found, cannot register channel tasks")
+                return
+            }
 
+            val consumer = { variant: Any ->
+                val variantName = variant.javaClass.getMethod("getName").invoke(variant) as String
+                val capitalizedVariantName = variantName.replaceFirstChar { it.uppercase() }
+
+                val cleanChannelTask = createCleanChannelTask(project, variantName, capitalizedVariantName)
+
+                project.tasks.register(
+                    "assemble${capitalizedVariantName}Channels",
+                    ChannelMaker::class.java
+                ) { task ->
+                    task.targetProject = project
+                    task.variantName = variantName
+                    task.setup()
+                    task.dependsOn("assemble$capitalizedVariantName")
+                    task.dependsOn(cleanChannelTask)
+                }
+            }
+
+            // Find onVariants(VariantSelector, Function1) method
+            var onVariantsMethod: java.lang.reflect.Method? = null
+            var useAction = false
+            try {
+                onVariantsMethod = androidComponents.javaClass.getMethod("onVariants",
+                    Class.forName("com.android.build.api.variant.VariantSelector"),
+                    Function1::class.java)
+            } catch (e: NoSuchMethodException) {
                 try {
-                    val onVariantsMethod = androidComponents.javaClass.getMethod("onVariants", Function1::class.java)
-                    @Suppress("UNCHECKED_CAST")
-                    val consumer = { variant: Any ->
-                        val variantName = variant.javaClass.getMethod("getName").invoke(variant) as String
-                        val capitalizedVariantName = variantName.replaceFirstChar { it.uppercase() }
-
-                        val cleanChannelTask = createCleanChannelTask(project, variantName, capitalizedVariantName)
-
-                        project.tasks.register(
-                            "assemble${capitalizedVariantName}Channels",
-                            ChannelMaker::class.java
-                        ) { task ->
-                            task.targetProject = project
-                            task.variantName = variantName
-                            task.setup()
-                            task.dependsOn("assemble$capitalizedVariantName")
-                            task.dependsOn(cleanChannelTask)
-                        }
-                    }
-                    onVariantsMethod.invoke(androidComponents, consumer)
-                } catch (e: Exception) {
-                    project.logger.warn("[Walle] Could not register tasks with androidComponents: ${e.message}")
+                    onVariantsMethod = androidComponents.javaClass.getMethod("onVariants",
+                        Class.forName("com.android.build.api.variant.VariantSelector"),
+                        Action::class.java)
+                    useAction = true
+                } catch (e2: NoSuchMethodException) {
+                    project.logger.warn("[Walle] onVariants(VariantSelector, callback) not found")
                 }
-            } else {
-                // ========== AGP 8.x approach ==========
+            }
+
+            if (onVariantsMethod != null) {
+                val selectorMethod = androidComponents.javaClass.getMethod("selector")
+                val selector = selectorMethod.invoke(androidComponents)
+                selector.javaClass.getMethod("all").invoke(selector)
+
+                val callback = if (useAction) Action<Any> { consumer(it) } else consumer
+                onVariantsMethod.invoke(androidComponents, selector, callback)
+            }
+        } else {
+            // ========== AGP 8.x approach: use afterEvaluate with applicationVariants ==========
+            project.afterEvaluate {
                 try {
                     val appExtensionClass = Class.forName("com.android.build.gradle.AppExtension")
                     val androidExt = project.extensions.findByType(appExtensionClass)
